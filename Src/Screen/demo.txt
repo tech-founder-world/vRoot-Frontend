@@ -1,0 +1,399 @@
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useIsFocused } from '@react-navigation/native';
+import { API_BASE_URL } from '../config/config';
+
+const ProfileScreen = ({ navigation }) => {
+  const isFocused = useIsFocused();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const storedUser = await AsyncStorage.getItem('userProfile');
+        if (!storedUser) return setLoading(false);
+
+        const { _id } = JSON.parse(storedUser);
+
+        const res = await fetch(`${API_BASE_URL}/api/user/${_id}`);
+        const data = await res.json();
+
+        if (data.user) {
+          setUser(data.user);
+        }
+      } catch (err) {
+        console.log('Error fetching profile:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isFocused) fetchProfile();
+  }, [isFocused]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FF007F" />
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={{ color: '#fff' }}>No user data found</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Image source={require('../Assests/logos.png')} style={styles.logo} />
+        <Text style={styles.appName}>vRoot</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('SettingScreen')}
+          style={styles.settingBtn}
+        >
+          <Image
+            source={require('../Assests/setting.png')}
+            style={styles.settingsIcon}
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Profile Info */}
+      <View style={styles.profileSection}>
+        <Image source={{ uri: user.profilePic }} style={styles.profilePic} />
+        <Text style={styles.name}>{user.name}</Text>
+        <Text style={styles.username}>@{user.username}</Text>
+        {user.category && <Text style={styles.category}>{user.category}</Text>}
+        <Text style={styles.bio}>{user.bio}</Text>
+
+        {/* Stats */}
+        <View style={styles.stats}>
+          <View style={styles.statBox}>
+            <Text style={styles.statNumber}>{user.posts?.length || 0}</Text>
+            <Text style={styles.statLabel}>Posts</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statNumber}>{user.followers?.length || 0}</Text>
+            <Text style={styles.statLabel}>Followers</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statNumber}>{user.following?.length || 0}</Text>
+            <Text style={styles.statLabel}>Following</Text>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          style={styles.editProfileBtn}
+          onPress={() => navigation.navigate('EditScreen')}
+        >
+          <Text style={styles.editProfileText}>Edit Profile</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Reels Grid */}
+      <FlatList
+        data={user.posts}
+        keyExtractor={(item) => item._id}
+        numColumns={3}
+        columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 3 }}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.reelContainer}
+            onPress={() => navigation.navigate('Reels', { videoId: item._id })}
+          >
+            <Image
+              source={{ uri: item.thumbnail || item.videoUrl }}
+              style={styles.reelThumbnail}
+            />
+          </TouchableOpacity>
+        )}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#121212', padding: 5 },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  logo: { width: 50, height: 50, borderRadius: 10, marginRight: 10 },
+  appName: { fontSize: 26, fontWeight: 'bold', color: '#FF007F' },
+  settingBtn: { marginLeft: 'auto', marginRight: 10 },
+  settingsIcon: { width: 25, height: 25, tintColor: '#FF007F' },
+
+  profileSection: { alignItems: 'center', marginBottom: 20 },
+  profilePic: { width: 100, height: 100, borderRadius: 50, borderWidth: 3, borderColor: '#FF007F' },
+  name: { fontSize: 22, color: '#fff', fontWeight: 'bold', marginTop: 5 },
+  username: { fontSize: 16, color: '#999', marginTop: 2 },
+  category: { fontSize: 14, color: '#FF007F', marginTop: 2 },
+  bio: { fontSize: 14, color: '#bbb', textAlign: 'center', marginTop: 5, paddingHorizontal: 10 },
+
+  stats: { flexDirection: 'row', marginTop: 10, paddingHorizontal: 20 },
+  statBox: { flex: 1, alignItems: 'center' },
+  statNumber: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
+  statLabel: { fontSize: 14, color: '#bbb' },
+
+  editProfileBtn: {
+    marginTop: 15,
+    backgroundColor: '#FF007F',
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginHorizontal: 5,
+    alignItems: 'center',
+  },
+  editProfileText: { fontSize: 16, fontWeight: 'bold', color: '#fff' },
+
+  reelContainer: {
+    width: '32%',
+    aspectRatio: 1,
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginBottom: 3,
+    backgroundColor: '#111',
+  },
+  reelThumbnail: { width: '100%', height: '100%', borderRadius: 10 },
+});
+
+export default ProfileScreen;
+
+
+// import React from 'react';
+// import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+
+// const ProfileScreen = ({navigation}) => {
+//   const user = {
+//     username: 'vRoot_User',
+//     bio: 'Creating short videos 🎥 | Follow for amazing content!',
+//     profilePic: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTITf7ZDWOwLBsg3chkn7rc7wyryzTRq0vGNA&s',
+//     followers: '100K',
+//     following: '320',
+//     posts: 45,
+//     reels: Array(12).fill('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzlhvJCHr2mv-jG3VOXGKn8nGZIO6lNUri3A&s'), // Dummy reel thumbnails
+//   };
+
+//   return (
+//     <View style={styles.container}>
+//       {/* Header */}
+//       <View style={styles.header}>
+//          <Image source={require('../Assests/logos.png')} style={styles.logo} />
+//         <Text style={styles.appName}>vRoot</Text>
+//         <TouchableOpacity onPress={()=>navigation.navigate('SettingScreen')}>
+//         <Image source={require('../Assests/setting.png')} style={{ width: 25,
+//     height: 25,tintColor:'#FF007F',marginLeft:200}} />
+//     </TouchableOpacity>
+//       </View>
+
+//       {/* Profile Info */}
+//       <View style={styles.profileSection}>
+//         <TouchableOpacity>
+//           <Image source={{ uri: user.profilePic }} style={styles.profilePic} />
+//           {/* <Ionicons name="camera" size={24} color="white" style={styles.cameraIcon} /> */}
+//         </TouchableOpacity>
+//         <Text style={styles.username}>{user.username}</Text>
+//         <Text style={styles.bio}>{user.bio}</Text>
+
+//         {/* Stats Section */}
+//         <View style={styles.stats}>
+//           <View style={styles.statBox}>
+//             <Text style={styles.statNumber}>{user.posts}</Text>
+//             <Text style={styles.statLabel}>Posts</Text>
+//           </View>
+//           <View style={styles.statBox}>
+//             <Text style={styles.statNumber}>{user.followers}</Text>
+//             <Text style={styles.statLabel}>Followers</Text>
+//           </View>
+//           <View style={styles.statBox}>
+//             <Text style={styles.statNumber}>{user.following}</Text>
+//             <Text style={styles.statLabel}>Following</Text>
+//           </View>
+//         </View>
+
+//         {/* Edit Profile Button */}
+//         <TouchableOpacity 
+//         style={styles.editProfileBtn} 
+//         onPress={() => navigation.navigate('EditScreen')}
+//         >
+//           <Text style={styles.editProfileText}>Edit Profile</Text>
+//         </TouchableOpacity>
+//       </View>
+
+//       {/* User Reels Grid */}
+//       <FlatList
+//       showsVerticalScrollIndicator={false}
+//         data={user.reels}
+//         numColumns={3}
+//         keyExtractor={(item, index) => index.toString()}
+//         renderItem={({ item }) => <TouchableOpacity style={{    width: '32%',
+//           height: 200,
+//           margin: 2,
+//           borderRadius: 10,
+//           borderColor:"#FF007F",
+//           borderWidth:1}}>
+//           <Image source={{ uri: item }} style={styles.reelThumbnail} />
+//           </TouchableOpacity>}
+//       />
+//     </View>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#121212',
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     // justifyContent: 'space-between',
+//     alignItems: 'center',
+//     padding: 10
+//   },
+//   appName: {
+//     fontSize: 26,
+//     fontWeight: 'bold',
+//     color: '#FF007F',
+//     // marginHorizontal:20
+//   },
+//   logo: {
+//     width: 40,
+//     height: 40,
+//     // borderRadius: 25,
+//     // marginRight: 10,
+//     // borderWidth: 2,
+//     // borderColor: '#fff',
+//     // shadowColor: '#000',
+//     // shadowOpacity: 0.3,
+//     // shadowRadius: 5,
+//     // elevation: 5,
+// },
+//   profileSection: {
+//     alignItems: 'center',
+//     padding: 20,
+//   },
+//   profilePic: {
+//     width: 100,
+//     height: 100,
+//     borderRadius: 50,
+//     borderWidth: 3,
+//     borderColor: '#FF007F',
+//   },
+//   cameraIcon: {
+//     position: 'absolute',
+//     bottom: 0,
+//     right: -5,
+//     backgroundColor: '#FF007F',
+//     padding: 5,
+//     borderRadius: 15,
+//   },
+//   username: {
+//     fontSize: 22,
+//     fontWeight: 'bold',
+//     color: '#fff',
+//     marginTop: 10,
+//   },
+//   bio: {
+//     fontSize: 14,
+//     color: '#bbb',
+//     textAlign: 'center',
+//     marginTop: 5,
+//   },
+//   stats: {
+//     flexDirection: 'row',
+//     marginTop: 15,
+//   },
+//   statBox: {
+//     alignItems: 'center',
+//     flex: 1,
+//   },
+//   statNumber: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     color: '#fff',
+//   },
+//   statLabel: {
+//     fontSize: 14,
+//     color: '#bbb',
+//   },
+//   editProfileBtn: {
+//     marginTop: 15,
+//     backgroundColor: '#FF007F',
+//     paddingVertical: 8,
+//     paddingHorizontal: 20,
+//     borderRadius: 20,
+//   },
+//   editProfileText: {
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//     color: '#fff',
+//   },
+//   reelThumbnail: {
+//     width: '100%',
+//     height: 200,
+//     margin: 2,
+//     borderRadius: 10,
+    
+//     // borderColor:"#FF007F",
+//     // borderWidth:1
+//   },
+
+// });
+
+// export default ProfileScreen;
+
+
+
+// import React, { useState, useEffect } from 'react';
+// import { View, Text, Image, StyleSheet } from 'react-native';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// const ProfileScreen = () => {
+//   const [profile, setProfile] = useState(null);
+
+//   useEffect(() => {
+//     const getProfileData = async () => {
+//       const data = await AsyncStorage.getItem('userProfile');
+//       if (data) {
+//         setProfile(JSON.parse(data));
+//       }
+//     };
+//     getProfileData();
+//   }, []);
+
+//   return (
+//     <View style={styles.container}>
+//       {profile && (
+//         <>
+//           <Image source={{ uri: profile.profilePic }} style={styles.profilePic} />
+//           <Text style={styles.username}>{profile.username}</Text>
+//           <Text style={styles.bio}>{profile.bio}</Text>
+//         </>
+//       )}
+//     </View>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+//   profilePic: { width: 100, height: 100, borderRadius: 50 },
+//   username: { fontSize: 20, fontWeight: 'bold', marginTop: 10 },
+//   bio: { fontSize: 14, color: '#666', marginTop: 5 },
+// });
+
+// export default ProfileScreen;
