@@ -17,6 +17,10 @@ import SplashScreen from '../Screen/SplashScreen';
 import OtherProfile from '../Screen/OtherProfile';
 import ReelsScreen from '../Screen/ReelsScreen';
 import UploadPostScreen from '../Screen/UploadPostScreen'
+import GetOtp from '../Auth/ForgetPassword/GetOtp';
+import VerifyOtp from '../Auth/ForgetPassword/VerifyOtp';
+import ChangePassword from '../Auth/ForgetPassword/ChangePassword';
+
 enableScreens();
 
 const Stack = createNativeStackNavigator();
@@ -48,6 +52,11 @@ const AppNavigation = ({ isLoggedIn }) => {
       {/* upload kregi post or reel */}
       <Stack.Screen name="UploadReel" component={UploadReelScreen} options={{ headerShown: false }} />
       <Stack.Screen name="UploadScreen" component={UploadPostScreen} options={{ headerShown: false }} />
+  
+      <Stack.Screen name="Getotp"component={GetOtp} options={{headerShown:false}}/>
+      <Stack.Screen name="Verifyotp"component={VerifyOtp} options={{headerShown:false}}/>
+      <Stack.Screen name="changepassword"component={ChangePassword} options={{headerShown:false}}/>
+   
     </Stack.Navigator>
   );
 };
