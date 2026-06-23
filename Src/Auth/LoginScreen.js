@@ -122,7 +122,7 @@ const LoginScreen = ({ navigation }) => {
         style={styles.container}>
 
       <View style={styles.loginbox}>
-        <Image source={require("../Assests/logo.png")}
+        <Image source={require("../Assests/logos.png")}
         style={styles.loginlogo}/>
         <Text style={styles.heading}>Welcome Back</Text>
         <Text style={styles.subheading}>Sign in to continue your vibe.</Text>

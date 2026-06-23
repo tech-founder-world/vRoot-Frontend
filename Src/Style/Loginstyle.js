@@ -10,7 +10,9 @@ const styles = StyleSheet.create({
     borderRadius:15,
     marginTop:20,
     borderWidth:1,
-    marginBottom:20
+    marginBottom:20,
+    fontSize:hp(4),
+    paddingLeft:15
   },
   forgetbox:
   {
@@ -61,7 +63,7 @@ const styles = StyleSheet.create({
     subheading:
     {
         color:'#bbb',
-        fontSize:hp(2),
+        fontSize:hp(1.7),
         // alignSelf:'center',
         marginBottom:20
     },
@@ -75,7 +77,7 @@ const styles = StyleSheet.create({
   },
 
   heading: {
-    fontSize:hp(4),
+    fontSize:hp(3.2),
     fontWeight: 'bold',
     color: '#fff',
     // alignSelf:'center',
@@ -108,7 +110,7 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: '#fff',
-    fontSize:hp(2),
+    fontSize:hp(2.2),
     fontWeight: 'bold',
   },
 
