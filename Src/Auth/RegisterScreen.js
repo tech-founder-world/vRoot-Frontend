@@ -8,6 +8,9 @@ import {
 } from 'react-native';
 import { ALERT_TYPE, Toast, Root,Dialog } from 'react-native-alert-notification';
 import { API_BASE_URL } from '../config/config';
+import LinearGradient from 'react-native-linear-gradient';
+import styles from '../Style/Loginstyle';
+// import styles from '../Style/RegisterStyle';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -96,8 +99,13 @@ const RegisterScreen = ({ navigation }) => {
 
   return (
     <Root>
-      <View style={styles.container}>
-        <Text style={styles.logo}>vRoot</Text>
+      <LinearGradient
+       colors={['#a90657','#2b09a6']}
+       style={styles.container}>
+
+      <View style={styles.loginbox}>
+        <Text style={styles.heading}>Create Your Account</Text>
+        <Text style={styles.subheading}>Start sharing reels, posts, and pure vibes.</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter Your Name"
@@ -121,62 +129,41 @@ const RegisterScreen = ({ navigation }) => {
           value={password}
           onChangeText={setPassword}
         />
+       
         <TouchableOpacity onPress={handleRegister} style={styles.buttonContainer}>
+         
+          <LinearGradient 
+          colors={['#f91a89','#653ef2']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.loginbtn}>
+           
           <Text style={styles.buttonText}>Register</Text>
-        </TouchableOpacity>
+           </LinearGradient>
+           </TouchableOpacity>
 
-        <Text
-          style={styles.loginText}
+        
+       
+        <TouchableOpacity
           onPress={() => navigation.navigate('LoginScreen')}
         >
-          Already have an account ? <Text style={{ color: '#FF007F', textDecorationLine: 'underline',fontWeight:'800' }}>login</Text>
-        </Text>
+
+          <Text style={styles.registerText}>
+            Already have an account?
+            <Text style={{
+              color: 'white',
+              fontWeight: '800'
+            }}>
+              {' '}Login
+            </Text>
+          </Text>
+
+        </TouchableOpacity>
+
       </View>
+      </LinearGradient>
     </Root>
   );
 };
 
 export default RegisterScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#121212',
-  },
-  logo: {
-    fontSize: 50,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 40,
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    borderBottomWidth: 1,
-    borderBottomColor: '#444',
-    color: '#fff',
-    fontSize: 16,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-  },
-  buttonContainer: {
-    backgroundColor: '#FF007F',
-    padding: 15,
-    borderRadius: 10,
-    width: '100%',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  loginText: {
-    color: '#bbb',
-    fontSize: 14,
-    marginVertical: 30
-  },
-});

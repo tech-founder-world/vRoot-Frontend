@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 
 import {
@@ -24,6 +25,7 @@ import { API_BASE_URL } from '../config/config';
 
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../Style/Loginstyle'
+import { stickyWorkers } from '../../metro.config';
 
 const LoginScreen = ({ navigation }) => {
 
@@ -114,10 +116,15 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <Root>
-      <View style={styles.container}>
+        <LinearGradient
+        colors={['#a90657','#2b09a6']}
+        style={styles.container}>
 
-        <Text style={styles.logo}>Welcome Back</Text>
-        <Text styee={styles.logo}>Sign in to continue your vibe.</Text>
+      <View style={styles.loginbox}>
+        <Image source={require("../Assests/logo.png")}
+        style={styles.loginlogo}/>
+        <Text style={styles.heading}>Welcome Back</Text>
+        <Text style={styles.subheading}>Sign in to continue your vibe.</Text>
 
         <TextInput
           style={styles.input}
@@ -138,12 +145,14 @@ const LoginScreen = ({ navigation }) => {
           onChangeText={setPassword}
         />
 
-        <TouchableOpacity
-          onPress={handleLogin}
-          style={styles.buttonContainer}
-          disabled={loading}
-        >
-
+<TouchableOpacity onPress={handleLogin}
+disabled={loading}>
+        <LinearGradient
+        colors={['#f91a89','#653ef2']}
+         start={{ x: 0, y: 0 }}
+         end={{ x: 1, y: 1 }}
+          style={styles.loginbtn}
+          >
           {
             loading ? (
               <ActivityIndicator color="#fff" />
@@ -151,8 +160,9 @@ const LoginScreen = ({ navigation }) => {
               <Text style={styles.buttonText}>Login</Text>
             )
           }
-
-        </TouchableOpacity>
+        </LinearGradient>
+            </TouchableOpacity>
+           
 
         <TouchableOpacity
           onPress={() => navigation.navigate('RegisterScreen')}
@@ -161,7 +171,7 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.registerText}>
             Don't have an account?
             <Text style={{
-              color: '#FF007F',
+              color: 'white',
               fontWeight: '800'
             }}>
               {' '}Register
@@ -171,6 +181,7 @@ const LoginScreen = ({ navigation }) => {
         </TouchableOpacity>
 
       </View>
+      </LinearGradient>
     </Root>
   );
 };

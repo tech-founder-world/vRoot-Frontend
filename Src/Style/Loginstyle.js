@@ -2,57 +2,83 @@ import { StyleSheet } from "react-native"
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
  
 const styles = StyleSheet.create({
+  loginlogo:
+  {
+    height:hp(9),
+    width:wp(9)
+  },
+  loginbox:
+  {
+    backgroundColor:'#38383b',
+     height:hp(75),
+    width:wp(95),
+    alignSelf:'center',
+    borderRadius:40,
+    padding:20,
+    elavation:10,
+    justifyContent:'center',
+    paddingTop:-20
+  },
     subheading:
     {
-        color:'white',
+        color:'#bbb',
+        fontSize:hp(2),
+        // alignSelf:'center',
+        marginBottom:30
     },
-    container: {
+
+    container:
+    {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#121212',
+    padding: 30,
+    // backgroundColor: '#121212',
   },
 
-  logo: {
-    fontSize:hp(5.5),
+  heading: {
+    fontSize:hp(4),
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 40,
+    // alignSelf:'center',
+    marginTop:10,
   },
 
   input: {
-    width: '100%',
-    height:hp(7),
-    // borderBottomWidth: 1.5,
-    // borderBottomColor: '#444',
-    // color: "red",
+    width:wp(85),
+    height:hp(6.5),
     fontSize:hp(1.8),
     marginBottom: 20,
     paddingHorizontal: 10,
     borderRadius:15,
-    backgroundColor:'#B8B8C5',
-    color:"#000"
+    alignSelf:'center',
+    backgroundColor:'#ddddeb',
+    color:"black",
+    placeholderTextColor:"red"
   },
 
-  buttonContainer: {
+  loginbtn: {
     backgroundColor: '#FF007F',
     padding: 15,
-    borderRadius: 10,
-    width: '100%',
-    alignItems: 'center',
+    borderRadius: 20,
+    width:wp(85),
+    height:hp(6.5),
+    alignSelf:'center',
+    alignItems:'center',
+    marginTop:10
   },
 
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize:hp(2),
     fontWeight: 'bold',
   },
 
   registerText: {
     marginTop: 20,
     color: '#bbb',
-    fontSize: 14,
+    fontSize: hp(2),
+    alignSelf:'center'
   },
 })
 
