@@ -3,7 +3,7 @@ import React from 'react'
 import LinearGradient from 'react-native-linear-gradient'
 import styles from '../../Style/Loginstyle'
 
-const VerifyOtp = () => {
+const VerifyOtp = ({navigation}) => {
   return (
     <LinearGradient 
      colors={['#a90657','#2b09a6']}
@@ -13,15 +13,33 @@ const VerifyOtp = () => {
       <Image source={require("../../Assests/verify.png")}
       style={styles.forgetpic}/>
       <View style={{flexDirection:'row',gap:10}}>
-        <TextInput style={styles.otpbox} keyboardType='numeric'></TextInput>
-      <TextInput style={styles.otpbox} keyboardType='numeric'></TextInput>
-       <TextInput style={styles.otpbox} keyboardType='numeric'></TextInput>
-       <TextInput style={styles.otpbox} keyboardType='numeric'></TextInput>
-        <TextInput style={styles.otpbox} keyboardType='numeric'></TextInput>
-        <TextInput style={styles.otpbox} keyboardType='numeric'></TextInput>
+        <TextInput style={styles.otpbox} 
+        keyboardType='numeric'
+        maxLength={1}></TextInput>
+
+      <TextInput style={styles.otpbox}
+       keyboardType='numeric'
+      maxLength={1}></TextInput>
+
+       <TextInput style={styles.otpbox}
+        keyboardType='numeric'
+       maxLength={1}></TextInput>
+
+       <TextInput style={styles.otpbox}
+        keyboardType='numeric'
+       maxLength={1}></TextInput>
+
+        <TextInput style={styles.otpbox} 
+        keyboardType='numeric'
+        maxLength={1}></TextInput>
+
+        <TextInput style={styles.otpbox}
+         keyboardType='numeric'
+        maxLength={1}></TextInput>
+        
       </View>
       <TouchableOpacity style={styles.buttonContainer}
-          onPress={()=>navigation.navigate("Verifyotp")}>
+          onPress={()=>navigation.navigate("changepassword")}>
          
           <LinearGradient 
           colors={['#f91a89','#653ef2']}
