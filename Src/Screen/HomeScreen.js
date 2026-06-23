@@ -10,11 +10,12 @@ import Video from 'react-native-video';
 import { useFocusEffect } from '@react-navigation/native';
 import { API_BASE_URL } from '../config/config';
 import { getToken } from '../services/authStorage';
-
+import Ionicons from 'react-native-vector-icons/Ionicons'
 const { width, height } = Dimensions.get('window');
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
-// ── Mix posts + reels (every 5th item is a reel) ─────────
+// ── Mix posts + reels (eve
+// ry 5th item is a reel) ─────────
 const mixFeed = (posts, reels) => {
   const shuffledPosts = shuffle(posts);
   const shuffledReels = shuffle(reels);
@@ -137,7 +138,8 @@ const PostCard = ({ item, myId, onLike, onComment, onSave, onShare, onProfile, o
     <View style={styles.card}>
       {/* ── Header ── */}
       <View style={styles.cardHeader}>
-        <TouchableOpacity style={styles.cardHeaderLeft} onPress={() => onProfile(ownerId)}>
+        <TouchableOpacity style={styles.cardHeaderLeft} 
+        onPress={() => onProfile(ownerId)}>
           <View style={styles.avatarRing}>
             <Image
               source={profileUri ? { uri: profileUri } : require('../Assests/user.png')}
@@ -572,7 +574,11 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.appName}>vRoot</Text>
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('SearchScreen')}>
-            <Text style={styles.headerIconText}>🔍</Text>
+            {/* <Text style={styles.headerIconText}>🔍</Text> */}
+            <Ionicons
+            name="person"
+            color="white"
+            size={20}/>
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('NotificationScreen')}>
             <Text style={styles.headerIconText}>🔔</Text>
