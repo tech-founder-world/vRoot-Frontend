@@ -2,6 +2,44 @@ import { StyleSheet } from "react-native"
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
  
 const styles = StyleSheet.create({
+  otpbox:
+  {
+    height:hp(7),
+    width:wp(12),
+    borderColor:'#f91a89',
+    borderRadius:15,
+    marginTop:20,
+    borderWidth:1,
+    marginBottom:20
+  },
+  forgetbox:
+  {
+    backgroundColor:'#38383b',
+     height:hp(65),
+    width:wp(95),
+    alignSelf:'center',
+    borderRadius:40,
+    padding:20,
+    elavation:10,
+    justifyContent:'center',
+    paddingTop:-20,
+    alignItems:'center',
+    elevation:10
+  },
+  forgetpic:
+  {
+    height:hp(20),
+    width:wp(50),
+    alignSelf:'center'
+  },
+  forgetpass:
+  {
+    color:"white",
+    fontWeight:'bold',
+    alignSelf:'flex-end',
+    marginTop:-10,
+    marginRight:12
+  },
   loginlogo:
   {
     height:hp(9),
@@ -10,21 +48,22 @@ const styles = StyleSheet.create({
   loginbox:
   {
     backgroundColor:'#38383b',
-     height:hp(75),
+     height:hp(65),
     width:wp(95),
     alignSelf:'center',
     borderRadius:40,
     padding:20,
     elavation:10,
     justifyContent:'center',
-    paddingTop:-20
+    paddingTop:-20,
+    elevation:10
   },
     subheading:
     {
         color:'#bbb',
         fontSize:hp(2),
         // alignSelf:'center',
-        marginBottom:30
+        marginBottom:20
     },
 
     container:
@@ -33,7 +72,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 30,
-    // backgroundColor: '#121212',
   },
 
   heading: {

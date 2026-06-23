@@ -26,6 +26,7 @@ import { API_BASE_URL } from '../config/config';
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../Style/Loginstyle'
 import { stickyWorkers } from '../../metro.config';
+import GetOtp from './ForgetPassword/GetOtp';
 
 const LoginScreen = ({ navigation }) => {
 
@@ -144,6 +145,9 @@ const LoginScreen = ({ navigation }) => {
           value={password}
           onChangeText={setPassword}
         />
+        <TouchableOpacity onPress={()=>navigation.navigate("Getotp")} >
+        <Text style={styles.forgetpass}>Forget Password</Text>
+        </TouchableOpacity>
 
 <TouchableOpacity onPress={handleLogin}
 disabled={loading}>
