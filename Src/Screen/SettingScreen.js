@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, Switch, Alert,
+<<<<<<< HEAD
   Image,ScrollView
+=======
+  Image
+>>>>>>> 1bb68de13429fb35a414c7b06255629cef33c84e
 } from 'react-native';
 import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import  API_BASE_URL  from '../config/config';
 
 import { logoutUser } from '../services/authStorage';
+<<<<<<< HEAD
 import LinearGradient from 'react-native-linear-gradient';
 import styles from '../Style/Loginstyle';
 
 const SettingsScreen = ({ navigation }) => {
   const [isPrivate,setIsPrivate]=useState("")
+=======
+const SettingsScreen = ({ navigation }) => {
+>>>>>>> 1bb68de13429fb35a414c7b06255629cef33c84e
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkMode, setDarkMode] = useState(true);
   const [userId, setUserId] = useState(null);
@@ -107,12 +115,17 @@ const SettingsScreen = ({ navigation }) => {
   
 
   return (
+<<<<<<< HEAD
     <ScrollView>
     <LinearGradient 
             colors={['#a90657', '#2b09a6']}
             style={styles.container}>
     <View>
       <Text style={styles.header}>Personal Information</Text>
+=======
+    <View style={styles.container}>
+      <Text style={styles.header}>Settings</Text>
+>>>>>>> 1bb68de13429fb35a414c7b06255629cef33c84e
 
       {/* Profile Settings */}
       {/* <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('EditProfile')}>
@@ -121,6 +134,7 @@ const SettingsScreen = ({ navigation }) => {
       </TouchableOpacity> */}
 
       {/* Privacy & Security */}
+<<<<<<< HEAD
       <View style={styles.settingbox}>
 
      <View style={styles.settingItem}>
@@ -139,11 +153,20 @@ const SettingsScreen = ({ navigation }) => {
                  </View>
      
 
+=======
+      <TouchableOpacity style={styles.settingItem} onPress={()=>navigation.navigate('PrivacyScreen')}>
+        <Image source={require('../Assests/secure.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
+        <Text style={styles.settingText}>Privacy & Security</Text>
+      </TouchableOpacity>
+
+      {/* Change Password */}
+>>>>>>> 1bb68de13429fb35a414c7b06255629cef33c84e
       <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('ChangePasswordScreen')}>
         <Image source={require('../Assests/lock.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Change Password</Text>
       </TouchableOpacity>
 
+<<<<<<< HEAD
       <TouchableOpacity style={styles.settingItem} onPress={deleteAccount}>
         <Image source={require('../Assests/bin.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Delete Account</Text>
@@ -155,6 +178,9 @@ const SettingsScreen = ({ navigation }) => {
 
        <View style={styles.settingbox}>
 
+=======
+      {/* Notifications Toggle */}
+>>>>>>> 1bb68de13429fb35a414c7b06255629cef33c84e
       <View style={styles.settingItem}>
         <Image source={require('../Assests/bell.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Notifications</Text>
@@ -165,6 +191,7 @@ const SettingsScreen = ({ navigation }) => {
           trackColor={{ false: '#D3D3D3', true: '#FF69B4' }}
           style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }} // Slightly enlarges the switch
         />
+<<<<<<< HEAD
 
       </View>
 
@@ -198,6 +225,12 @@ const SettingsScreen = ({ navigation }) => {
 
       {/* Theme Toggle */}
       {/* <View style={styles.settingItem}>
+=======
+      </View>
+
+      {/* Theme Toggle */}
+      <View style={styles.settingItem}>
+>>>>>>> 1bb68de13429fb35a414c7b06255629cef33c84e
         <Image source={require('../Assests/dark.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Dark Mode</Text>
         <Switch
@@ -207,6 +240,7 @@ const SettingsScreen = ({ navigation }) => {
           trackColor={{ false: '#D3D3D3', true: '#FF69B4' }}
           style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }} // Slightly enlarges the switch
         />
+<<<<<<< HEAD
       </View> */}
 
             <Text style={styles.header}>App Security</Text>
@@ -216,6 +250,9 @@ const SettingsScreen = ({ navigation }) => {
         <Image source={require('../Assests/secure.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Privacy & Security</Text>
       </TouchableOpacity>
+=======
+      </View>
+>>>>>>> 1bb68de13429fb35a414c7b06255629cef33c84e
 
       {/* Help & Support */}
       <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('Support')}>
@@ -223,6 +260,7 @@ const SettingsScreen = ({ navigation }) => {
         <Text style={styles.settingText}>Help & Support</Text>
       </TouchableOpacity>
 
+<<<<<<< HEAD
       {/* Help & Support */}
       <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('Support')}>
         <Image source={require('../Assests/help.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
@@ -231,15 +269,20 @@ const SettingsScreen = ({ navigation }) => {
 
        <View style={styles.settingbox}>
 
+=======
+>>>>>>> 1bb68de13429fb35a414c7b06255629cef33c84e
       {/* About App */}
       <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('About')}>
         <Image source={require('../Assests/about.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>About vRoot</Text>
       </TouchableOpacity>
 
+<<<<<<< HEAD
       </View>
       </View>
 
+=======
+>>>>>>> 1bb68de13429fb35a414c7b06255629cef33c84e
       {/* Logout */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutText}>Logout</Text>
@@ -250,6 +293,7 @@ const SettingsScreen = ({ navigation }) => {
         <Text style={styles.deleteText}>Delete Account</Text>
       </TouchableOpacity>
     </View>
+<<<<<<< HEAD
     </LinearGradient>
     </ScrollView>
   );
@@ -272,5 +316,26 @@ const SettingsScreen = ({ navigation }) => {
 //   deleteText: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
 
 // });
+=======
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#121212', padding: 20 },
+  header: { fontSize: 24, fontWeight: 'bold', color: '#FF007F', marginBottom: 20, textAlign: 'center' },
+  settingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  settingText: { fontSize: 18, color: '#fff', marginLeft: 15, flex: 1 },
+  logoutButton: { marginTop: 50, backgroundColor: '#FF007F', padding: 12, borderRadius: 10, alignItems: 'center' },
+  logoutText: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
+  deleteButton: { marginTop: 15, backgroundColor: '#ff4444', padding: 12, borderRadius: 10, alignItems: 'center' },
+  deleteText: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
+});
+>>>>>>> 1bb68de13429fb35a414c7b06255629cef33c84e
 
 export default SettingsScreen;
