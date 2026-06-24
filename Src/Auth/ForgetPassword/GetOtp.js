@@ -1,10 +1,12 @@
 import { StyleSheet, Text, TextInput, View,TouchableOpacity, Image } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import LinearGradient from 'react-native-linear-gradient'
 import styles from '../../Style/Loginstyle'
 import VerifyOtp from './VerifyOtp'
 
 const GetOtp = ({navigation}) => {
+  const[email,setemail]=useState("")
+   
   return (
     <LinearGradient
        colors={['#a90657','#2b09a6']}
@@ -13,10 +15,13 @@ const GetOtp = ({navigation}) => {
     <View style={styles.forgetbox}>
         <Image source={require("../../Assests/forget.png")}
         style={styles.forgetpic}/>
-        
+
         <Text style={styles.heading}>Forget Password?</Text>
         <Text>Enter your email and we'll send you a code</Text>
-        <TextInput style={[styles.input,{marginTop:20}]} placeholder='Enter Your Email'></TextInput>
+        <TextInput style={[styles.input,{marginTop:20}]}
+         placeholder='Enter Your Email'
+         value={email}
+         onChangeText={setemail}></TextInput>
 
          <TouchableOpacity style={styles.buttonContainer}
           onPress={()=>navigation.navigate("Verifyotp")}>
