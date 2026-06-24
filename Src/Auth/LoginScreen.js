@@ -137,7 +137,6 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.heading}>Welcome Back</Text>
           <Text style={styles.subheading}>Sign in to continue your vibe.</Text>
 
-<<<<<<< HEAD
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -148,13 +147,6 @@ const LoginScreen = ({ navigation }) => {
             onChangeText={setEmail}
             editable={!loading}
           />
-=======
-      <View style={styles.loginbox}>
-        <Image source={require("../Assests/logos.png")}
-        style={styles.loginlogo}/>
-        <Text style={styles.heading}>Welcome Back</Text>
-        <Text style={styles.subheading}>Sign in to continue your vibe.</Text>
->>>>>>> 850a58b5e0b4b35785f68940aca557e4255a12c8
 
           <TextInput
             style={styles.input}
