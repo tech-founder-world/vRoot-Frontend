@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, Switch, Alert,
-  Image
+  Image,ScrollView
 } from 'react-native';
 import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import  API_BASE_URL  from '../config/config';
 
 import { logoutUser } from '../services/authStorage';
+import LinearGradient from 'react-native-linear-gradient';
+import styles from '../Style/Loginstyle';
+
 const SettingsScreen = ({ navigation }) => {
+  const [isPrivate,setIsPrivate]=useState("")
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkMode, setDarkMode] = useState(true);
   const [userId, setUserId] = useState(null);
@@ -103,8 +107,12 @@ const SettingsScreen = ({ navigation }) => {
   
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Settings</Text>
+    <ScrollView>
+    <LinearGradient 
+            colors={['#a90657', '#2b09a6']}
+            style={styles.container}>
+    <View>
+      <Text style={styles.header}>Personal Information</Text>
 
       {/* Profile Settings */}
       {/* <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('EditProfile')}>
@@ -113,18 +121,40 @@ const SettingsScreen = ({ navigation }) => {
       </TouchableOpacity> */}
 
       {/* Privacy & Security */}
-      <TouchableOpacity style={styles.settingItem} onPress={()=>navigation.navigate('PrivacyScreen')}>
-        <Image source={require('../Assests/secure.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
-        <Text style={styles.settingText}>Privacy & Security</Text>
-      </TouchableOpacity>
+      <View style={styles.settingbox}>
 
-      {/* Change Password */}
+     <View style={styles.settingItem}>
+        <Image source={require('../Assests/padlock.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
+        <Text style={styles.settingText}>Private Account</Text>
+                   <Switch
+                     value={isPrivate}
+                     onValueChange={setIsPrivate}
+                     thumbColor={isPrivate ? '#FF007F' : '#ccc'}
+                     trackColor={{
+                       false: '#333',
+                       true: '#FF007F'
+                     }}
+                   />
+     
+                 </View>
+     
+
       <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('ChangePasswordScreen')}>
         <Image source={require('../Assests/lock.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Change Password</Text>
       </TouchableOpacity>
 
-      {/* Notifications Toggle */}
+      <TouchableOpacity style={styles.settingItem} onPress={deleteAccount}>
+        <Image source={require('../Assests/bin.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
+        <Text style={styles.settingText}>Delete Account</Text>
+      </TouchableOpacity>
+
+      </View>
+
+      <Text style={styles.header}> General Setting</Text>
+
+       <View style={styles.settingbox}>
+
       <View style={styles.settingItem}>
         <Image source={require('../Assests/bell.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Notifications</Text>
@@ -135,10 +165,39 @@ const SettingsScreen = ({ navigation }) => {
           trackColor={{ false: '#D3D3D3', true: '#FF69B4' }}
           style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }} // Slightly enlarges the switch
         />
+
       </View>
 
+    <View style={styles.settingItem}>
+        <Image source={require('../Assests/add-friend.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
+        <Text style={styles.settingText}>Active Status</Text>
+        <Switch
+          value={notificationsEnabled}
+          onValueChange={toggleNotifications}
+          thumbColor={darkMode ? '#FF007F' : '#E0E0E0'}
+          trackColor={{ false: '#D3D3D3', true: '#FF69B4' }}
+          style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }} // Slightly enlarges the switch
+        />
+        
+      </View>
+
+      </View>
+
+      {/* Notifications Toggle */}
+      {/* <View style={styles.settingItem}>
+        <Image source={require('../Assests/bell.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
+        <Text style={styles.settingText}>Notifications</Text>
+        <Switch
+          value={notificationsEnabled}
+          onValueChange={toggleNotifications}
+          thumbColor={darkMode ? '#FF007F' : '#E0E0E0'}
+          trackColor={{ false: '#D3D3D3', true: '#FF69B4' }}
+          style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }} // Slightly enlarges the switch
+        />
+      </View> */}
+
       {/* Theme Toggle */}
-      <View style={styles.settingItem}>
+      {/* <View style={styles.settingItem}>
         <Image source={require('../Assests/dark.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Dark Mode</Text>
         <Switch
@@ -148,7 +207,15 @@ const SettingsScreen = ({ navigation }) => {
           trackColor={{ false: '#D3D3D3', true: '#FF69B4' }}
           style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }} // Slightly enlarges the switch
         />
-      </View>
+      </View> */}
+
+            <Text style={styles.header}>App Security</Text>
+                   <View style={styles.settingbox}>
+
+      <TouchableOpacity style={styles.settingItem} onPress={()=>navigation.navigate('PrivacyScreen')}>
+        <Image source={require('../Assests/secure.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
+        <Text style={styles.settingText}>Privacy & Security</Text>
+      </TouchableOpacity>
 
       {/* Help & Support */}
       <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('Support')}>
@@ -156,11 +223,22 @@ const SettingsScreen = ({ navigation }) => {
         <Text style={styles.settingText}>Help & Support</Text>
       </TouchableOpacity>
 
+      {/* Help & Support */}
+      <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('Support')}>
+        <Image source={require('../Assests/help.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
+        <Text style={styles.settingText}>Terms & Condition</Text>
+      </TouchableOpacity>
+
+       <View style={styles.settingbox}>
+
       {/* About App */}
       <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('About')}>
         <Image source={require('../Assests/about.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>About vRoot</Text>
       </TouchableOpacity>
+
+      </View>
+      </View>
 
       {/* Logout */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -172,24 +250,27 @@ const SettingsScreen = ({ navigation }) => {
         <Text style={styles.deleteText}>Delete Account</Text>
       </TouchableOpacity>
     </View>
+    </LinearGradient>
+    </ScrollView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#121212', padding: 20 },
-  header: { fontSize: 24, fontWeight: 'bold', color: '#FF007F', marginBottom: 20, textAlign: 'center' },
-  settingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
-  },
-  settingText: { fontSize: 18, color: '#fff', marginLeft: 15, flex: 1 },
-  logoutButton: { marginTop: 50, backgroundColor: '#FF007F', padding: 12, borderRadius: 10, alignItems: 'center' },
-  logoutText: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
-  deleteButton: { marginTop: 15, backgroundColor: '#ff4444', padding: 12, borderRadius: 10, alignItems: 'center' },
-  deleteText: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
-});
+// const styles = StyleSheet.create({
+//   container: { flex: 1, backgroundColor: '#121212', padding: 20 },
+//   header: { fontSize: 24, fontWeight: 'bold', color: '#FF007F', marginBottom: 20, textAlign: 'center' },
+//   settingItem: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     paddingVertical: 15,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#333',
+//   },
+//   settingText: { fontSize: 18, color: '#fff', marginLeft: 15, flex: 1 },
+//   logoutButton: { marginTop: 50, backgroundColor: '#FF007F', padding: 12, borderRadius: 10, alignItems: 'center' },
+//   logoutText: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
+//   deleteButton: { marginTop: 15, backgroundColor: '#ff4444', padding: 12, borderRadius: 10, alignItems: 'center' },
+//   deleteText: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
+
+// });
 
 export default SettingsScreen;

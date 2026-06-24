@@ -47,7 +47,7 @@ const LoginScreen = ({ navigation }) => {
 
     try {
       // ✅ UPDATED: New login endpoint with email verification check
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -160,7 +160,7 @@ const LoginScreen = ({ navigation }) => {
 
           {/* ✅ Forgot Password Button */}
           <TouchableOpacity
-            onPress={() => navigation.navigate('ForgotPassword')}
+            onPress={() => navigation.navigate('Getotp')}
             style={{ alignSelf: 'flex-end', marginBottom: 10 }}
           >
             <Text style={{ color: '#bbb', fontSize: 14 }}>

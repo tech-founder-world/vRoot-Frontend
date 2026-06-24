@@ -98,7 +98,7 @@ const RegisterScreen = ({ navigation }) => {
           button: 'Verify Now',
           onPressButton: () => {
             Dialog.hide();
-            navigation.navigate('VerifyEmail', {
+            navigation.navigate('Verifyotp', {
               userId: data.userId,
               email: data.email || email,
             });
@@ -117,7 +117,7 @@ const RegisterScreen = ({ navigation }) => {
             button: 'Verify Now',
             onPressButton: () => {
               Dialog.hide();
-              navigation.navigate('VerifyEmail', {
+              navigation.navigate('Verifyotp', {
                 userId: data.userId,
                 email: data.email || email,
               });
