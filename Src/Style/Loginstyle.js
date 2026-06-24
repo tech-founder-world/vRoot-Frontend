@@ -2,7 +2,6 @@ import { StyleSheet } from "react-native"
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
  
 const styles = StyleSheet.create({
-<<<<<<< HEAD
   mainContainer: {
     flex: 1,
     backgroundColor: '#000',
@@ -189,8 +188,6 @@ const styles = StyleSheet.create({
   deleteText:
    { fontSize: 18, fontWeight: 'bold', color: '#fff' },
 
-=======
->>>>>>> 1bb68de13429fb35a414c7b06255629cef33c84e
   otpbox:
   {
     height:hp(7),
@@ -255,11 +252,8 @@ const styles = StyleSheet.create({
         fontSize:hp(1.7),
         // alignSelf:'center',
         marginBottom:20
-<<<<<<< HEAD
 
 
-=======
->>>>>>> 1bb68de13429fb35a414c7b06255629cef33c84e
     },
 
     container:
