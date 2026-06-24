@@ -263,10 +263,6 @@ const VerifyOtpScreen = ({ navigation, route }) => {
     });
   };
 
-<<<<<<< HEAD
-=======
-const VerifyOtp = ({navigation}) => {
->>>>>>> 850a58b5e0b4b35785f68940aca557e4255a12c8
   return (
     <Root>
       <LinearGradient
@@ -280,7 +276,6 @@ const VerifyOtp = ({navigation}) => {
             style={styles.forgetpic}
           />
 
-<<<<<<< HEAD
           {/* ✅ Heading */}
           <Text style={[styles.heading, { fontSize: 24, textAlign: 'center' }]}>
             Verify Email
@@ -297,53 +292,6 @@ const VerifyOtp = ({navigation}) => {
           }]}>
             {email || 'your email'}
           </Text>
-=======
-    <View style={styles.forgetbox}>
-      <Image source={require("../../Assests/verify.png")}
-      style={styles.forgetpic}/>
-      <View style={{flexDirection:'row',gap:10}}>
-        <TextInput style={styles.otpbox} 
-        keyboardType='numeric'
-        maxLength={1}></TextInput>
-
-      <TextInput style={styles.otpbox}
-       keyboardType='numeric'
-      maxLength={1}></TextInput>
-
-       <TextInput style={styles.otpbox}
-        keyboardType='numeric'
-       maxLength={1}></TextInput>
-
-       <TextInput style={styles.otpbox}
-        keyboardType='numeric'
-       maxLength={1}></TextInput>
-
-        <TextInput style={styles.otpbox} 
-        keyboardType='numeric'
-        maxLength={1}></TextInput>
-
-        <TextInput style={styles.otpbox}
-         keyboardType='numeric'
-        maxLength={1}></TextInput>
-        
-      </View>
-      <TouchableOpacity style={styles.buttonContainer}
-          onPress={()=>navigation.navigate("changepassword")}>
-         
-          <LinearGradient 
-          colors={['#f91a89','#653ef2']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.loginbtn}>
-           
-          <Text style={styles.buttonText}>Verify OTP</Text>
-           </LinearGradient>
-           </TouchableOpacity>
-    </View>
-    </LinearGradient>
-  )
-}
->>>>>>> 850a58b5e0b4b35785f68940aca557e4255a12c8
 
           {/* ✅ OTP Input Boxes */}
           <View style={otpStyles.otpContainer}>
