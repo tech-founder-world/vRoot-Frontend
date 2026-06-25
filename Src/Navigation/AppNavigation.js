@@ -20,6 +20,8 @@ import UploadPostScreen from '../Screen/UploadPostScreen'
 import GetOtp from '../Auth/ForgetPassword/GetOtp';
 import VerifyOtp from '../Auth/ForgetPassword/VerifyOtp';
 import ChangePassword from '../Auth/ForgetPassword/ChangePassword';
+import PrivacyPolicyScreen from '../Screen/PrivacyPolicyScreen';
+import TermsScreen from '../Screen/TermsScreen';
 
 enableScreens();
 
@@ -56,7 +58,10 @@ const AppNavigation = ({ isLoggedIn }) => {
       <Stack.Screen name="Getotp"component={GetOtp} options={{headerShown:false}}/>
       <Stack.Screen name="Verifyotp"component={VerifyOtp} options={{headerShown:false}}/>
       <Stack.Screen name="changepassword"component={ChangePassword} options={{headerShown:false}}/>
-   
+      <Stack.Screen name="Privacypolicy"component={PrivacyPolicyScreen} options={{headerShown:false}}/>
+      <Stack.Screen name="termsscreen"component={TermsScreen} options={{headerShown:false}}/>
+
+
     </Stack.Navigator>
   );
 };
