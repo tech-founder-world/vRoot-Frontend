@@ -14,10 +14,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import styles from '../../Style/Loginstyle';
 
 const VerifyOtpScreen = ({ navigation, route }) => {
-  // ✅ Get userId from navigation params
-  const { userId, email } = route.params || {};
+  // ✅ Get params from route
+  const { userId, email, isResetPassword } = route.params || {};
   
-  // ✅ State variables
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
@@ -45,19 +44,16 @@ const VerifyOtpScreen = ({ navigation, route }) => {
 
   // ✅ Handle OTP input change
   const handleOtpChange = (text, index) => {
-    // Only allow numbers
     if (text && !/^[0-9]$/.test(text)) return;
 
     const newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
 
-    // Auto-focus next input
     if (text && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // Auto-submit when all digits filled
     if (text && index === 5) {
       const otpString = newOtp.join('');
       if (otpString.length === 6) {
@@ -70,16 +66,6 @@ const VerifyOtpScreen = ({ navigation, route }) => {
   const handleKeyPress = (e, index) => {
     if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  // ✅ Handle paste from clipboard
-  const handlePaste = (text) => {
-    if (text.length === 6 && /^[0-9]{6}$/.test(text)) {
-      const newOtp = text.split('');
-      setOtp(newOtp);
-      // Auto-submit
-      setTimeout(() => handleVerify(text), 300);
     }
   };
 
@@ -98,9 +84,9 @@ const VerifyOtpScreen = ({ navigation, route }) => {
       Toast.show({
         type: ALERT_TYPE.DANGER,
         title: 'Error',
-        textBody: 'User ID not found. Please register again.',
+        textBody: 'User ID not found. Please try again.',
       });
-      navigation.navigate('RegisterScreen');
+      navigation.navigate('LoginScreen');
       return;
     }
 
@@ -108,8 +94,14 @@ const VerifyOtpScreen = ({ navigation, route }) => {
 
     try {
       console.log('📤 Verifying OTP for user:', userId);
+      console.log('📤 Is Reset Password:', isResetPassword);
       
-      const response = await fetch(`${API_BASE_URL}/api/users/verify-email`, {
+      // ✅ Different API endpoints based on flow
+      const endpoint = isResetPassword 
+        ? '/api/users/verify-reset-otp' 
+        : '/api/users/verify-email';
+      
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -120,41 +112,38 @@ const VerifyOtpScreen = ({ navigation, route }) => {
         }),
       });
 
-      const textResponse = await response.text();
-      console.log('📥 Verify Response:', textResponse);
-
-      let data;
-      try {
-        data = JSON.parse(textResponse);
-      } catch (parseError) {
-        console.error('❌ JSON Parse Error:', parseError);
-        Toast.show({
-          type: ALERT_TYPE.DANGER,
-          title: 'Error',
-          textBody: 'Server error. Please try again.',
-        });
-        setLoading(false);
-        return;
-      }
+      const data = await response.json();
+      console.log('📥 Verify OTP response:', data);
 
       if (data.success) {
-        // ✅ Save token (if you have storage)
-        // await saveToken(data.token);
-        // await saveUser(data.user);
-
-        Dialog.show({
-          type: ALERT_TYPE.SUCCESS,
-          title: '✅ Email Verified!',
-          message: 'Your account has been verified successfully.',
-          button: 'Go to Login',
-          onPressButton: () => {
-            Dialog.hide();
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'LoginScreen' }],
-            });
-          },
-        });
+        if (isResetPassword) {
+          // ✅ For Reset Password - Navigate to Reset Password Screen
+          Dialog.show({
+            type: ALERT_TYPE.SUCCESS,
+            title: '✅ OTP Verified!',
+            message: 'Proceed to reset your password.',
+            button: 'Reset Password',
+            onPressButton: () => {
+              Dialog.hide();
+              navigation.navigate('ResetPassword', { userId });
+            },
+          });
+        } else {
+          // ✅ For Email Verification - Navigate to Login
+          Dialog.show({
+            type: ALERT_TYPE.SUCCESS,
+            title: '✅ Email Verified!',
+            message: 'Your account has been verified successfully.',
+            button: 'Go to Login',
+            onPressButton: () => {
+              Dialog.hide();
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'LoginScreen' }],
+              });
+            },
+          });
+        }
       } else {
         Toast.show({
           type: ALERT_TYPE.DANGER,
@@ -193,9 +182,9 @@ const VerifyOtpScreen = ({ navigation, route }) => {
       Toast.show({
         type: ALERT_TYPE.DANGER,
         title: 'Error',
-        textBody: 'User ID not found. Please register again.',
+        textBody: 'User ID not found. Please try again.',
       });
-      navigation.navigate('RegisterScreen');
+      navigation.navigate('LoginScreen');
       return;
     }
 
@@ -204,24 +193,28 @@ const VerifyOtpScreen = ({ navigation, route }) => {
     try {
       console.log('📤 Resending OTP for user:', userId);
       
-      const response = await fetch(`${API_BASE_URL}/api/users/resend-otp`, {
+      // ✅ Different endpoints for resend
+      const endpoint = isResetPassword
+        ? '/api/users/forgot-password'
+        : '/api/users/resend-otp';
+      
+      const body = isResetPassword
+        ? { email: email }
+        : { userId: userId };
+
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          userId: userId,
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        // ✅ Reset timer
         setTimer(60);
         setCanResend(false);
-        
-        // ✅ Clear previous OTP
         setOtp(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
 
@@ -249,18 +242,13 @@ const VerifyOtpScreen = ({ navigation, route }) => {
     }
   };
 
-  // ✅ Navigate back to register
-  const handleBackToRegister = () => {
-    Dialog.show({
-      type: ALERT_TYPE.WARNING,
-      title: 'Cancel Verification?',
-      message: 'Are you sure you want to go back? Your account will not be verified.',
-      button: 'Yes, Go Back',
-      onPressButton: () => {
-        Dialog.hide();
-        navigation.navigate('RegisterScreen');
-      },
-    });
+  // ✅ Navigate back
+  const handleBack = () => {
+    if (isResetPassword) {
+      navigation.navigate('LoginScreen');
+    } else {
+      navigation.navigate('RegisterScreen');
+    }
   };
 
   return (
@@ -270,15 +258,13 @@ const VerifyOtpScreen = ({ navigation, route }) => {
         style={styles.container}
       >
         <View style={styles.forgetbox}>
-          {/* ✅ Image */}
           <Image
             source={require("../../Assests/verify.png")}
             style={styles.forgetpic}
           />
 
-          {/* ✅ Heading */}
           <Text style={[styles.heading, { fontSize: 24, textAlign: 'center' }]}>
-            Verify Email
+            {isResetPassword ? 'Reset Password' : 'Verify Email'}
           </Text>
           <Text style={[styles.subheading, { textAlign: 'center', marginBottom: 10 }]}>
             Enter the 6-digit code sent to
@@ -313,10 +299,6 @@ const VerifyOtpScreen = ({ navigation, route }) => {
                 placeholderTextColor="rgba(255,255,255,0.3)"
                 editable={!loading}
                 selectTextOnFocus
-                onPaste={(e) => {
-                  const pastedText = e.nativeEvent.text;
-                  if (pastedText) handlePaste(pastedText);
-                }}
               />
             ))}
           </View>
@@ -355,19 +337,21 @@ const VerifyOtpScreen = ({ navigation, route }) => {
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={styles.buttonText}>Verify OTP</Text>
+                <Text style={styles.buttonText}>
+                  {isResetPassword ? 'Verify & Reset' : 'Verify OTP'}
+                </Text>
               )}
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* ✅ Back to Register */}
+          {/* ✅ Back Button */}
           <TouchableOpacity
-            onPress={handleBackToRegister}
+            onPress={handleBack}
             style={{ marginTop: 15 }}
             disabled={loading}
           >
             <Text style={[styles.registerText, { color: '#bbb' }]}>
-              ← Wrong email? Register Again
+              {isResetPassword ? '← Back to Login' : '← Back to Register'}
             </Text>
           </TouchableOpacity>
         </View>

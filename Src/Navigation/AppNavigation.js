@@ -56,8 +56,8 @@ const AppNavigation = ({ isLoggedIn }) => {
       <Stack.Screen name="UploadScreen" component={UploadPostScreen} options={{ headerShown: false }} />
   
       <Stack.Screen name="Getotp"component={GetOtp} options={{headerShown:false}}/>
-      <Stack.Screen name="Verifyotp"component={VerifyOtp} options={{headerShown:false}}/>
-      <Stack.Screen name="changepassword"component={ChangePassword} options={{headerShown:false}}/>
+      <Stack.Screen name="VerifyOtp"component={VerifyOtp} options={{headerShown:false}}/>
+      <Stack.Screen name="ResetPassword"component={ChangePassword} options={{headerShown:false}}/>
       <Stack.Screen name="Privacypolicy"component={PrivacyPolicyScreen} options={{headerShown:false}}/>
       <Stack.Screen name="termsscreen"component={TermsScreen} options={{headerShown:false}}/>
 

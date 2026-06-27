@@ -4,18 +4,18 @@ import {
   StyleSheet, ActivityIndicator, RefreshControl,
   TextInput, Alert, StatusBar, Dimensions,
   Animated, Share, Modal, ScrollView, KeyboardAvoidingView,
-  Platform
+  Platform, Linking
 } from 'react-native';
 import Video from 'react-native-video';
 import { useFocusEffect } from '@react-navigation/native';
 import { API_BASE_URL } from '../config/config';
 import { getToken } from '../services/authStorage';
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 const { width, height } = Dimensions.get('window');
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
-// ── Mix posts + reels (eve
-// ry 5th item is a reel) ─────────
+// ── Mix posts + reels ─────────
 const mixFeed = (posts, reels) => {
   const shuffledPosts = shuffle(posts);
   const shuffledReels = shuffle(reels);
@@ -75,8 +75,19 @@ const FloatingHeart = ({ visible }) => {
 };
 
 // ── Stories Bar ───────────────────────────────────────────
-const StoriesBar = ({ stories }) => (
+const StoriesBar = ({ stories, navigation, myId }) => (
   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.storiesBar} contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 8 }}>
+    {/* Your Story */}
+    <TouchableOpacity style={styles.storyItem} onPress={() => Alert.alert('Your Story', 'Coming soon!')}>
+      <View style={[styles.storyRing, styles.yourStoryRing]}>
+        <Image source={require('../Assests/user.png')} style={styles.storyAvatar} />
+        <View style={styles.addStoryBadge}>
+          <Text style={styles.addStoryText}>+</Text>
+        </View>
+      </View>
+      <Text style={styles.storyName}>Your Story</Text>
+    </TouchableOpacity>
+
     {stories.map((s, i) => (
       <TouchableOpacity key={i} style={styles.storyItem} onPress={() => Alert.alert('Stories', 'Coming soon!')}>
         <View style={styles.storyRing}>
@@ -89,12 +100,13 @@ const StoriesBar = ({ stories }) => (
 );
 
 // ── Post Card ─────────────────────────────────────────────
-const PostCard = ({ item, myId, onLike, onComment, onSave, onShare, onProfile, onMoreOptions }) => {
+const PostCard = ({ item, myId, onLike, onComment, onSave, onShare, onProfile, onMoreOptions, navigation }) => {
   const [showAllComments, setShowAllComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [heartVisible, setHeartVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
   const liked = item.likes?.map(String).includes(String(myId));
   const saved = item.savedBy?.map(String).includes(String(myId));
@@ -138,8 +150,7 @@ const PostCard = ({ item, myId, onLike, onComment, onSave, onShare, onProfile, o
     <View style={styles.card}>
       {/* ── Header ── */}
       <View style={styles.cardHeader}>
-        <TouchableOpacity style={styles.cardHeaderLeft} 
-        onPress={() => onProfile(ownerId)}>
+        <TouchableOpacity style={styles.cardHeaderLeft} onPress={() => onProfile(ownerId)}>
           <View style={styles.avatarRing}>
             <Image
               source={profileUri ? { uri: profileUri } : require('../Assests/user.png')}
@@ -155,9 +166,7 @@ const PostCard = ({ item, myId, onLike, onComment, onSave, onShare, onProfile, o
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => onMoreOptions(item)} style={styles.moreBtn}>
-          {/* <Text style={styles.moreDots}>•••</Text> */}
-            <Image source={require("../Assests/dots.png") }  style={{height:25,width:25,tintColor:"red"}} />
-
+          <Image source={require("../Assests/menu.png")} style={{ height: 25, width: 25, tintColor: "red" }} />
         </TouchableOpacity>
       </View>
 
@@ -170,32 +179,27 @@ const PostCard = ({ item, myId, onLike, onComment, onSave, onShare, onProfile, o
       {/* ── Action row ── */}
       <View style={styles.actionsRow}>
         <View style={styles.leftActions}>
-          {/* Like */}
-          <TouchableOpacity onPress={handleLikePress} style={styles.actionBtn} activeOpacity={0.7}>
-            <Animated.Text style={[styles.actionIcon, { transform: [{ scale: likeScale }] }]}>
-              {liked ? '❤️' : '🤍'}
-            </Animated.Text>
-          </TouchableOpacity>
-          {/* Comment */}
+        <TouchableOpacity onPress={handleLikePress} style={styles.actionBtn} activeOpacity={0.7}>
+  <Animated.View style={{ transform: [{ scale: likeScale }] }}>
+    <Image 
+      source={liked ? require('../Assests/fil_like.png') : require('../Assests/like.png')} 
+      style={[styles.actionIconImage, liked && {tintColor:"#dd1111"} , !liked && {tintColor:"#c9c4c7"}]} 
+    />
+  </Animated.View>
+</TouchableOpacity>
           <TouchableOpacity onPress={() => setShowCommentInput(s => !s)} style={styles.actionBtn} activeOpacity={0.7}>
-            {/* <Text style={styles.actionIcon}>💬</Text> */}
-            <Image source={require("../Assests/comment.png") }  style={{height:25,width:25,tintColor: '#FF007F'}} />
-
+            <Image source={require("../Assests/comment.png")} style={{ height: 25, width: 25, tintColor: '#c9c4c7' }} />
           </TouchableOpacity>
-          {/* Share */}
           <TouchableOpacity onPress={() => onShare(item)} style={styles.actionBtn} activeOpacity={0.7}>
-            {/* <Text style={styles.actionIcon}>↗️</Text> */}
-            <Image source={require("../Assests/send.png") }  style={{height:25,width:25,tintColor: '#FF007F'}} />
+            <Image source={require("../Assests/send.png")} style={{ height: 25, width: 25, tintColor: '#c9c4c7' }} />
           </TouchableOpacity>
         </View>
-        {/* Save */}
-     {/* Save */}
-<TouchableOpacity onPress={() => onSave(item._id)} activeOpacity={1}>
-  <Image 
-    source={saved ? require("../Assests/save.png") : require("../Assests/unsave.png")} 
-    style={[styles.actionIconImage, saved && { tintColor: '#FF007F' }]} 
-  />
-</TouchableOpacity>
+        <TouchableOpacity onPress={() => onSave(item._id)} activeOpacity={1}>
+          <Image
+            source={saved ? require("../Assests/save.png") : require("../Assests/unsave.png")}
+            style={[styles.actionIconImage, saved && { tintColor: '#c9c4c7' } ,!saved && {tintColor:"c9c4c7"}]}
+          />
+        </TouchableOpacity>
       </View>
 
       {/* ── Like count ── */}
@@ -290,17 +294,14 @@ const InlineReel = ({ item, navigation }) => {
           repeat
           paused={paused}
         />
-        {/* Dark gradient overlay */}
         <View style={styles.reelOverlay} />
 
-        {/* Top label */}
         <View style={styles.reelTopBar}>
           <View style={styles.reelBadge}>
             <Text style={styles.reelBadgeText}>▶  Reel</Text>
           </View>
         </View>
 
-        {/* Play icon */}
         {paused && (
           <View style={styles.playOverlay}>
             <View style={styles.playCircle}>
@@ -309,7 +310,6 @@ const InlineReel = ({ item, navigation }) => {
           </View>
         )}
 
-        {/* Bottom info */}
         <View style={styles.reelBottom}>
           <View style={styles.reelUserRow}>
             <Image
@@ -325,7 +325,6 @@ const InlineReel = ({ item, navigation }) => {
         </View>
       </TouchableOpacity>
 
-      {/* Watch full reel button */}
       <TouchableOpacity
         style={styles.watchFullBtn}
         onPress={() => navigation.navigate('Reels', { initialIndex: 0, videos: [item] })}
@@ -351,7 +350,7 @@ const getTimeAgo = (date) => {
 };
 
 // ── More Options Modal ────────────────────────────────────
-const MoreOptionsModal = ({ visible, item, myId, onClose, onDelete, onReport }) => (
+const MoreOptionsModal = ({ visible, item, myId, onClose, onDelete, onReport, onEdit }) => (
   <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
     <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={onClose} />
     <View style={styles.optionSheet}>
@@ -361,8 +360,14 @@ const MoreOptionsModal = ({ visible, item, myId, onClose, onDelete, onReport }) 
           <TouchableOpacity style={styles.optionBtn} onPress={() => { onDelete(item._id); onClose(); }}>
             <Text style={[styles.optionText, { color: '#FF3B30' }]}>🗑  Delete Post</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.optionBtn} onPress={onClose}>
+          <TouchableOpacity style={styles.optionBtn} onPress={() => { onEdit(item); onClose(); }}>
             <Text style={styles.optionText}>✏️  Edit Caption</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.optionBtn} onPress={() => { 
+            Alert.alert('Archive', 'Post archived successfully!');
+            onClose();
+          }}>
+            <Text style={styles.optionText}>📦  Archive Post</Text>
           </TouchableOpacity>
         </>
       ) : (
@@ -370,8 +375,17 @@ const MoreOptionsModal = ({ visible, item, myId, onClose, onDelete, onReport }) 
           <TouchableOpacity style={styles.optionBtn} onPress={() => { onReport(item._id); onClose(); }}>
             <Text style={[styles.optionText, { color: '#FF3B30' }]}>🚩  Report Post</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.optionBtn} onPress={onClose}>
+          <TouchableOpacity style={styles.optionBtn} onPress={() => { 
+            Alert.alert('Not Interested', 'We\'ll show fewer posts like this');
+            onClose();
+          }}>
             <Text style={styles.optionText}>🚫  Not Interested</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.optionBtn} onPress={() => { 
+            Alert.alert('Hide', 'Post hidden from your feed');
+            onClose();
+          }}>
+            <Text style={styles.optionText}>👁️  Hide Post</Text>
           </TouchableOpacity>
         </>
       )}
@@ -384,19 +398,19 @@ const MoreOptionsModal = ({ visible, item, myId, onClose, onDelete, onReport }) 
 
 // ── Main Screen ───────────────────────────────────────────
 export default function HomeScreen({ navigation }) {
-  const [feed, setFeed]          = useState([]);
-  const [loading, setLoading]    = useState(true);
+  const [feed, setFeed] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefresh] = useState(false);
-  const [myId, setMyId]          = useState(null);
-  const [stories, setStories]    = useState([]);
+  const [myId, setMyId] = useState(null);
+  const [stories, setStories] = useState([]);
   const [moreModal, setMoreModal] = useState({ visible: false, item: null });
+  const [editModal, setEditModal] = useState({ visible: false, item: null, caption: '' });
 
   // ── Load feed ────────────────────────────────
   const loadFeed = useCallback(async (isRefresh = false) => {
     try {
       const token = await getToken();
 
-      // My profile
       if (token) {
         const me = await fetch(`${API_BASE_URL}/api/users/profile`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -404,7 +418,6 @@ export default function HomeScreen({ navigation }) {
         const meData = await me.json();
         if (meData.success) {
           setMyId(meData.user._id);
-          // Use following as stories
           setStories(
             (meData.user.following || []).slice(0, 12).map(u => ({
               name: u.username || u.name || 'User',
@@ -415,7 +428,6 @@ export default function HomeScreen({ navigation }) {
         }
       }
 
-      // Posts + reels in parallel
       const [postRes, reelRes] = await Promise.all([
         fetch(`${API_BASE_URL}/api/posts/feed`, token ? { headers: { Authorization: `Bearer ${token}` } } : {}),
         fetch(`${API_BASE_URL}/api/video/reels`),
@@ -436,7 +448,6 @@ export default function HomeScreen({ navigation }) {
     }
   }, []);
 
-  // ✅ Auto-refresh on screen focus with random shuffle
   useFocusEffect(
     useCallback(() => {
       loadFeed();
@@ -446,7 +457,6 @@ export default function HomeScreen({ navigation }) {
   // ── Handlers ─────────────────────────────────
 
   const handleLike = async (postId) => {
-    // Optimistic update
     setFeed(prev => prev.map(item =>
       item._id === postId ? {
         ...item,
@@ -462,7 +472,6 @@ export default function HomeScreen({ navigation }) {
         headers: { Authorization: `Bearer ${token}` }
       });
     } catch (e) {
-      // Revert on fail
       setFeed(prev => prev.map(item =>
         item._id === postId ? {
           ...item,
@@ -492,7 +501,6 @@ export default function HomeScreen({ navigation }) {
   };
 
   const handleSave = async (postId) => {
-    // Optimistic
     setFeed(prev => prev.map(item =>
       item._id === postId ? {
         ...item,
@@ -522,7 +530,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   const handleDelete = async (postId) => {
-    Alert.alert('Delete Post', 'Are you sure?', [
+    Alert.alert('Delete Post', 'Are you sure you want to delete this post?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete', style: 'destructive',
@@ -534,25 +542,50 @@ export default function HomeScreen({ navigation }) {
               headers: { Authorization: `Bearer ${token}` }
             });
             setFeed(prev => prev.filter(item => item._id !== postId));
+            Alert.alert('Deleted', 'Post deleted successfully');
           } catch (e) { console.log(e); }
         }
       }
     ]);
   };
 
+  const handleEditCaption = (item) => {
+    setEditModal({ visible: true, item: item, caption: item.caption || '' });
+  };
+
+  const submitEditCaption = async () => {
+    const { item, caption } = editModal;
+    if (!caption.trim()) {
+      Alert.alert('Error', 'Caption cannot be empty');
+      return;
+    }
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API_BASE_URL}/api/posts/${item._id}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ caption: caption.trim() })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFeed(prev => prev.map(p =>
+          p._id === item._id ? { ...p, caption: caption.trim() } : p
+        ));
+        Alert.alert('Success', 'Caption updated!');
+        setEditModal({ visible: false, item: null, caption: '' });
+      }
+    } catch (e) { console.log(e); }
+  };
+
   const handleReport = (postId) => {
-    Alert.alert('Report', 'Post has been reported. Thank you!');
+    Alert.alert('Report', 'Post has been reported. Our team will review it.');
   };
 
   const handleProfile = (userId) => {
     if (!userId) return;
     if (String(userId) === String(myId)) {
-
-      // Tab navigator ke andar Profile tab ko navigate karein
-      navigation.navigate('TabNavigation', {
-        screen: 'Profile', // Apne Tab ke naam se replace karein
-      });
-    }else {
+      navigation.navigate('TabNavigation', { screen: 'Profile' });
+    } else {
       navigation.navigate('OtherProfile', { userId });
     }
   };
@@ -572,21 +605,28 @@ export default function HomeScreen({ navigation }) {
       {/* ── Header ── */}
       <View style={styles.header}>
         <Text style={styles.appName}>vRoot</Text>
-        <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('SearchScreen')}>
-            {/* <Text style={styles.headerIconText}>🔍</Text> */}
-            <Ionicons
-            name="person"
-            color="white"
-            size={20}/>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('NotificationScreen')}>
-            <Text style={styles.headerIconText}>🔔</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('ChatListScreen')}>
-            <Text style={styles.headerIconText}>✉️</Text>
-          </TouchableOpacity>
-        </View>
+       <View style={styles.headerRight}>
+  <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('SearchScreen')}>
+    <Image 
+      source={require('../Assests/search.png')} 
+      style={styles.headerIconImage} 
+    />
+  </TouchableOpacity>
+  
+  <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('NotificationScreen')}>
+    <Image 
+      source={require('../Assests/bell.png')} 
+      style={styles.headerIconImage} 
+    />
+  </TouchableOpacity>
+  
+  <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('ChatListScreen')}>
+    <Image 
+      source={require('../Assests/comment.png')} 
+      style={styles.headerIconImage} 
+    />
+  </TouchableOpacity>
+</View>
       </View>
 
       <FlatList
@@ -605,7 +645,7 @@ export default function HomeScreen({ navigation }) {
         ListHeaderComponent={
           stories.length > 0 ? (
             <View style={styles.storiesSection}>
-              <StoriesBar stories={stories} />
+              <StoriesBar stories={stories} navigation={navigation} myId={myId} />
               <View style={styles.divider} />
             </View>
           ) : null
@@ -637,6 +677,7 @@ export default function HomeScreen({ navigation }) {
               onShare={handleShare}
               onProfile={handleProfile}
               onMoreOptions={handleMoreOptions}
+              navigation={navigation}
             />
           );
         }}
@@ -650,7 +691,43 @@ export default function HomeScreen({ navigation }) {
         onClose={() => setMoreModal({ visible: false, item: null })}
         onDelete={handleDelete}
         onReport={handleReport}
+        onEdit={handleEditCaption}
       />
+
+      {/* Edit Caption Modal */}
+      <Modal
+        visible={editModal.visible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setEditModal({ visible: false, item: null, caption: '' })}
+      >
+        <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setEditModal({ visible: false, item: null, caption: '' })} />
+        <View style={styles.editSheet}>
+          <Text style={styles.editTitle}>Edit Caption</Text>
+          <TextInput
+            style={styles.editInput}
+            value={editModal.caption}
+            onChangeText={(text) => setEditModal(prev => ({ ...prev, caption: text }))}
+            placeholder="Write a caption..."
+            placeholderTextColor="#555"
+            multiline
+          />
+          <View style={styles.editButtons}>
+            <TouchableOpacity
+              style={[styles.editBtn, styles.editCancelBtn]}
+              onPress={() => setEditModal({ visible: false, item: null, caption: '' })}
+            >
+              <Text style={styles.editBtnText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.editBtn, styles.editSaveBtn]}
+              onPress={submitEditCaption}
+            >
+              <Text style={[styles.editBtnText, { color: '#fff' }]}>Save</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -658,160 +735,263 @@ export default function HomeScreen({ navigation }) {
 // ── Styles ────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0a0a' },
-  center:    { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0a' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0a' },
 
   // Header
   header: {
-    height: 52, backgroundColor: '#0a0a0a',
-    flexDirection: 'row', alignItems: 'center',
+    height: 52,
+    backgroundColor: '#0a0a0a',
+    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 14,
-    borderBottomWidth: 0.5, borderBottomColor: '#1a1a1a',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#1a1a1a',
   },
-  appName:     { color: '#FF007F', fontSize: 24, fontWeight: '900', letterSpacing: -0.5 },
+  appName: { color: '#FF007F', fontSize: 24, fontWeight: '900', letterSpacing: -0.5 },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  headerIcon:  { padding: 6 },
+  headerIcon: { padding: 6 },
   headerIconText: { fontSize: 20 },
-
+headerRight: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 6,
+},
+headerIcon: {
+  padding: 6,
+},
+headerIconImage: {
+  width: 24,
+  height: 24,
+  tintColor: '#c9c4c7', // Default color
+},
   // Stories
   storiesSection: { backgroundColor: '#0a0a0a' },
-  storiesBar:     { backgroundColor: '#0a0a0a' },
-  storyItem:      { alignItems: 'center', marginRight: 14, width: 68 },
-  storyRing:      {
-    width: 66, height: 66, borderRadius: 33,
-    borderWidth: 2.5, borderColor: '#FF007F',
-    padding: 2, marginBottom: 4,
+  storiesBar: { backgroundColor: '#0a0a0a' },
+  storyItem: { alignItems: 'center', marginRight: 14, width: 68 },
+  storyRing: {
+    width: 66,
+    height: 66,
+    borderRadius: 33,
+    borderWidth: 2.5,
+    borderColor: '#FF007F',
+    padding: 2,
+    marginBottom: 4,
   },
-  storyAvatar:    { width: 57, height: 57, borderRadius: 28.5 },
-  storyName:      { color: '#ccc', fontSize: 11, textAlign: 'center', width: 68 },
-  divider:        { height: 0.5, backgroundColor: '#1a1a1a', marginTop: 4 },
+  yourStoryRing: { borderColor: '#888' },
+  storyAvatar: { width: 57, height: 57, borderRadius: 28.5 },
+  addStoryBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    backgroundColor: '#FF007F',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#0a0a0a',
+  },
+  addStoryText: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
+  storyName: { color: '#ccc', fontSize: 11, textAlign: 'center', width: 68 },
+  divider: { height: 0.5, backgroundColor: '#1a1a1a', marginTop: 4 },
 
   // Post Card
   card: { backgroundColor: '#0a0a0a', marginBottom: 4 },
   cardHeader: {
-    flexDirection: 'row', alignItems: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12, paddingVertical: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   cardHeaderLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   avatarRing: {
-    width: 42, height: 42, borderRadius: 21,
-    borderWidth: 2, borderColor: '#FF007F',
-    padding: 1.5, marginRight: 10,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 2,
+    borderColor: '#FF007F',
+    padding: 1.5,
+    marginRight: 10,
   },
-  avatar:       { width: 35, height: 35, borderRadius: 17.5 },
+  avatar: { width: 35, height: 35, borderRadius: 17.5 },
   cardUsername: { color: '#fff', fontWeight: '700', fontSize: 13.5 },
-  location:     { color: '#888', fontSize: 11, marginTop: 1 },
-  timeAgo:      { color: '#555', fontSize: 11, marginTop: 1 },
-  moreBtn:      { paddingHorizontal: 8, paddingVertical: 4 },
-  moreDots:     { color: '#fff', fontSize: 16, letterSpacing: 1 },
+  location: { color: '#888', fontSize: 11, marginTop: 1 },
+  timeAgo: { color: '#555', fontSize: 11, marginTop: 1 },
+  moreBtn: { paddingHorizontal: 8, paddingVertical: 4 },
+  moreDots: { color: '#fff', fontSize: 16, letterSpacing: 1 },
 
   // Post image
   imageWrapper: { position: 'relative' },
-  postImage:    { width, height: width, backgroundColor: '#111' },
+  postImage: { width, height: width, backgroundColor: '#111' },
   floatingHeart: {
-    position: 'absolute', top: '50%', left: '50%',
-    marginLeft: -40, marginTop: -40,
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginLeft: -40,
+    marginTop: -40,
     zIndex: 10,
   },
 
   // Actions
-  actionsRow:  { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 10, alignItems: 'center' },
+  actionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
   leftActions: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  actionBtn:   { padding: 4 },
-  actionIcon:  { fontSize: 27 },
+  actionBtn: { padding: 4 },
+  actionIcon: { fontSize: 27 },
+  actionIconImage: { height: 25, width: 25 },
 
   // Post info
-  likeCount:    { color: '#fff', fontWeight: '700', fontSize: 13.5, paddingHorizontal: 12, marginBottom: 5 },
-  captionRow:   { paddingHorizontal: 12, marginBottom: 5 },
-  captionText:  { color: '#ccc', lineHeight: 19, fontSize: 13.5 },
-  captionBody:  { color: '#ccc' },
-  moreText:     { color: '#888', fontSize: 13 },
+  likeCount: { color: '#fff', fontWeight: '700', fontSize: 13.5, paddingHorizontal: 12, marginBottom: 5 },
+  captionRow: { paddingHorizontal: 12, marginBottom: 5 },
+  captionText: { color: '#ccc', lineHeight: 19, fontSize: 13.5 },
+  captionBody: { color: '#ccc' },
+  moreText: { color: '#888', fontSize: 13 },
   viewCommentsBtn: { paddingHorizontal: 12, marginBottom: 4 },
-  viewCommentsText:{ color: '#888', fontSize: 13 },
-  commentRow:   { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, marginBottom: 2 },
+  viewCommentsText: { color: '#888', fontSize: 13 },
+  commentRow: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, marginBottom: 2 },
   commentUsername: { color: '#fff', fontWeight: '700', fontSize: 13 },
-  commentBody:  { color: '#aaa', fontSize: 13, flexShrink: 1 },
-  timestampText:{ color: '#444', fontSize: 11, paddingHorizontal: 12, marginBottom: 8, marginTop: 2 },
+  commentBody: { color: '#aaa', fontSize: 13, flexShrink: 1 },
+  timestampText: { color: '#444', fontSize: 11, paddingHorizontal: 12, marginBottom: 8, marginTop: 2 },
 
   // Comment input
   commentInputRow: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 12, paddingVertical: 8,
-    borderTopWidth: 0.5, borderTopColor: '#1a1a1a',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderTopWidth: 0.5,
+    borderTopColor: '#1a1a1a',
     backgroundColor: '#0d0d0d',
   },
   commentBox: {
-    flex: 1, color: '#fff', fontSize: 13.5,
-    backgroundColor: '#1a1a1a', borderRadius: 20,
-    paddingHorizontal: 14, paddingVertical: 8,
+    flex: 1,
+    color: '#fff',
+    fontSize: 13.5,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     marginRight: 10,
   },
-  postBtn:     { paddingHorizontal: 4 },
+  postBtn: { paddingHorizontal: 4 },
   postBtnText: { color: '#FF007F', fontWeight: '700', fontSize: 14 },
 
   // Inline Reel
   reelCard: {
-    height: 500, backgroundColor: '#111',
-    marginBottom: 4, position: 'relative', overflow: 'hidden',
+    height: 500,
+    backgroundColor: '#111',
+    marginBottom: 4,
+    position: 'relative',
+    overflow: 'hidden',
   },
   reelOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.25)',
   },
   reelTopBar: {
-    position: 'absolute', top: 14, left: 14,
-    flexDirection: 'row', alignItems: 'center',
+    position: 'absolute',
+    top: 14,
+    left: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   reelBadge: {
     backgroundColor: 'rgba(255,0,127,0.85)',
-    borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4,
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
   reelBadgeText: { color: '#fff', fontWeight: '700', fontSize: 12 },
-  playOverlay:   { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center' },
-  playCircle:    {
-    width: 62, height: 62, borderRadius: 31,
+  playOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center' },
+  playCircle: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
     backgroundColor: 'rgba(255,255,255,0.15)',
-    justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.4)',
   },
   reelBottom: { position: 'absolute', bottom: 52, left: 14, right: 60 },
   reelUserRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
   reelAvatar: { width: 30, height: 30, borderRadius: 15, marginRight: 8, borderWidth: 1.5, borderColor: '#fff' },
   reelUsername: { color: '#fff', fontWeight: '700', fontSize: 13.5 },
-  reelTitle:    { color: '#fff', fontWeight: '800', fontSize: 15, marginBottom: 3 },
-  reelDesc:     { color: '#ccc', fontSize: 13 },
+  reelTitle: { color: '#fff', fontWeight: '800', fontSize: 15, marginBottom: 3 },
+  reelDesc: { color: '#ccc', fontSize: 13 },
   watchFullBtn: {
-    position: 'absolute', bottom: 12, left: 14, right: 14,
+    position: 'absolute',
+    bottom: 12,
+    left: 14,
+    right: 14,
     backgroundColor: 'rgba(255,0,127,0.15)',
-    borderWidth: 1, borderColor: 'rgba(255,0,127,0.5)',
-    borderRadius: 10, paddingVertical: 10, alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,0,127,0.5)',
+    borderRadius: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
   },
   watchFullText: { color: '#FF007F', fontWeight: '700', fontSize: 13 },
 
   // Empty state
-  emptyText:    { color: '#555', fontSize: 17, fontWeight: '700' },
+  emptyText: { color: '#555', fontSize: 17, fontWeight: '700' },
   emptySubText: { color: '#333', fontSize: 13, marginTop: 4, marginBottom: 20 },
-  uploadBtn:    { backgroundColor: '#FF007F', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 22 },
-  uploadBtnText:{ color: '#fff', fontWeight: '700', fontSize: 14 },
+  uploadBtn: { backgroundColor: '#FF007F', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 22 },
+  uploadBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
 
   // More options modal
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)' },
   optionSheet: {
     backgroundColor: '#141414',
-    borderTopLeftRadius: 24, borderTopRightRadius: 24,
-    paddingHorizontal: 20, paddingBottom: 32, paddingTop: 12,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 32,
+    paddingTop: 12,
   },
   optionHandle: {
-    width: 40, height: 4, borderRadius: 2,
-    backgroundColor: '#333', alignSelf: 'center', marginBottom: 16,
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#333',
+    alignSelf: 'center',
+    marginBottom: 16,
   },
-  optionBtn:  { paddingVertical: 16 },
+  optionBtn: { paddingVertical: 16 },
   optionText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  actionIconImage: {
-  height: 23,
-  width: 23,
-  tintColor: '#FF007F' 
-  // Remove tintColor from here if you want dynamic coloring
-}
+
+  // Edit modal
+  editSheet: {
+    backgroundColor: '#141414',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 32,
+    paddingTop: 20,
+    marginTop: 'auto',
+  },
+  editTitle: { color: '#fff', fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 16 },
+  editInput: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    color: '#fff',
+    fontSize: 16,
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  editButtons: { flexDirection: 'row', marginTop: 16, gap: 12 },
+  editBtn: { flex: 1, paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
+  editCancelBtn: { backgroundColor: '#1a1a1a' },
+  editSaveBtn: { backgroundColor: '#FF007F' },
+  editBtnText: { fontSize: 16, fontWeight: '600' },
 });

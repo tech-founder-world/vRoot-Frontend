@@ -2,7 +2,8 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
   Image, Dimensions, ActivityIndicator, Animated,
-  TextInput, KeyboardAvoidingView, Modal, Platform, StatusBar
+  TextInput, KeyboardAvoidingView, Modal, Platform, StatusBar,
+  Alert
 } from 'react-native';
 import Video from 'react-native-video';
 import Share from 'react-native-share';
@@ -30,16 +31,21 @@ const ReelsScreen = ({ navigation, route }) => {
   const [followed, setFollowed] = useState({});
   const likeScale = useRef(new Animated.Value(1)).current;
 
-  // ✅ Follow state ko ref mein bhi rakho
-  // taaki fetchVideos dobara call hone par local changes lost na hon
-  const followedRef = useRef({});
-
   const [commentModal, setCommentModal] = useState(false);
   const [activeVideoId, setActiveVideoId] = useState(null);
   const [commentText, setCommentText]   = useState('');
   const [commentsMap, setCommentsMap]   = useState({});
 
   const flatListRef = useRef(null);
+
+  // ✅ Helper to get full media URL
+  const getMediaUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+    return `${API_BASE_URL}${path}`;
+  };
 
   // ── Fetch reels ──────────────────────────────
   const fetchVideos = async (randomize = false) => {
@@ -66,24 +72,16 @@ const ReelsScreen = ({ navigation, route }) => {
           const userId = meData.user._id;
           setMyId(userId);
 
-          // ✅ Following list backend se lo
+          // ✅ Get following list from backend
           const myFollowingIds = (meData.user.following || []).map(String);
 
-          // ✅ Followed state: backend data + local changes jo user ne is session mein kiye
-          // followedRef mein jo hai wo local overrides hain — unhe preserve karo
+          // ✅ Set followed state
           const followMap = {};
           arr.forEach(v => {
             const ownerId = String(v.userId?._id || v.userId);
-            if (ownerId in followedRef.current) {
-              // User ne is session mein manually follow/unfollow kiya — usse rakho
-              followMap[ownerId] = followedRef.current[ownerId];
-            } else {
-              // Backend se actual state lo
-              followMap[ownerId] = myFollowingIds.includes(ownerId);
-            }
+            followMap[ownerId] = myFollowingIds.includes(ownerId);
           });
           setFollowed(followMap);
-          followedRef.current = followMap;
 
           // Saved state
           const savedMap = {};
@@ -122,7 +120,6 @@ const ReelsScreen = ({ navigation, route }) => {
   useFocusEffect(
     useCallback(() => {
       setIsPlaying(true);
-      if (!initialVideos) fetchVideos(true);
       return () => setIsPlaying(false);
     }, [])
   );
@@ -137,8 +134,6 @@ const ReelsScreen = ({ navigation, route }) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    // ✅ Refresh par followedRef clear karo taaki fresh backend data aaye
-    followedRef.current = {};
     await fetchVideos(true);
     setCurrentIndex(0);
     setRefreshing(false);
@@ -174,7 +169,6 @@ const ReelsScreen = ({ navigation, route }) => {
 
   // ── Save ─────────────────────────────────────
   const handleSave = async (videoId) => {
-    // Optimistic UI
     setSaved(prev => ({ ...prev, [videoId]: !prev[videoId] }));
     try {
       const token = await getToken();
@@ -183,43 +177,48 @@ const ReelsScreen = ({ navigation, route }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
     } catch (e) {
-      // Revert on error
       setSaved(prev => ({ ...prev, [videoId]: !prev[videoId] }));
       console.log(e);
     }
   };
 
   // ── Follow ────────────────────────────────────
-  // ✅ Follow state ref mein bhi save karo
-  // taaki fetchVideos dobara aane par local change preserve ho
   const handleFollow = async (targetUserId) => {
     if (!targetUserId) return;
+    if (String(targetUserId) === String(myId)) {
+      Alert.alert('Info', 'You cannot follow yourself');
+      return;
+    }
 
-    const newState = !followed[targetUserId];
+    const currentState = followed[targetUserId];
+    const newState = !currentState;
 
-    // ✅ State + ref dono update karo
+    // ✅ Optimistic UI update
     setFollowed(prev => ({ ...prev, [targetUserId]: newState }));
-    followedRef.current = { ...followedRef.current, [targetUserId]: newState };
 
     try {
       const token = await getToken();
       const res = await fetch(`${API_BASE_URL}/api/users/follow/${targetUserId}`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       const data = await res.json();
-
-      // ✅ Backend se actual state confirm karo
-      // Backend usually toggle karta hai aur response mein actual state deta hai
-      if (data?.isFollowing !== undefined) {
-        setFollowed(prev => ({ ...prev, [targetUserId]: data.isFollowing }));
-        followedRef.current = { ...followedRef.current, [targetUserId]: data.isFollowing };
+      
+      // ✅ Confirm with backend response
+      if (data?.success && data?.following !== undefined) {
+        setFollowed(prev => ({ ...prev, [targetUserId]: data.following }));
+      } else {
+        // If backend didn't return following state, revert
+        setFollowed(prev => ({ ...prev, [targetUserId]: currentState }));
       }
     } catch (e) {
-      // Error pe revert karo
-      setFollowed(prev => ({ ...prev, [targetUserId]: !newState }));
-      followedRef.current = { ...followedRef.current, [targetUserId]: !newState };
-      console.log(e);
+      // ❌ Error - revert
+      console.log('Follow error:', e);
+      setFollowed(prev => ({ ...prev, [targetUserId]: currentState }));
+      Alert.alert('Error', 'Could not follow/unfollow user');
     }
   };
 
@@ -227,7 +226,10 @@ const ReelsScreen = ({ navigation, route }) => {
   const handleShare = async (videoUrl) => {
     try {
       const url = videoUrl?.startsWith('http') ? videoUrl : `${API_BASE_URL}${videoUrl}`;
-      await Share.open({ url: encodeURI(url), message: 'Check out this reel on vRoot!' });
+      await Share.open({ 
+        url: encodeURI(url), 
+        message: 'Check out this reel on vRoot!' 
+      });
     } catch (e) { console.error(e); }
   };
 
@@ -257,7 +259,10 @@ const ReelsScreen = ({ navigation, route }) => {
       const token = await getToken();
       const res   = await fetch(`${API_BASE_URL}/api/video/${activeVideoId}/comment`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { 
+          Authorization: `Bearer ${token}`, 
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify({ text })
       });
       const data = await res.json();
@@ -265,6 +270,16 @@ const ReelsScreen = ({ navigation, route }) => {
         setCommentsMap(prev => ({ ...prev, [activeVideoId]: data.comments }));
       }
     } catch (e) { console.log(e); }
+  };
+
+  // ── Navigate to OtherProfile ──────────────────
+  const goToProfile = (userId) => {
+    if (!userId) return;
+    if (String(userId) === String(myId)) {
+      navigation.navigate('TabNavigation', { screen: 'Profile' });
+    } else {
+      navigation.navigate('OtherProfile', { userId: userId });
+    }
   };
 
   // ── Render item ───────────────────────────────
@@ -277,8 +292,9 @@ const ReelsScreen = ({ navigation, route }) => {
     const username     = item.userId?.username || item.userId?.name || 'vRoot User';
     const profilePic   = item.userId?.profilePic;
     const ownerId      = item.userId?._id || item.userId;
-    const isFollowedUser = followed[ownerId];
-    const isSaved      = saved[item._id];
+    const isFollowedUser = followed[ownerId] || false;
+    const isSaved      = saved[item._id] || false;
+    const isLiked      = likes[item._id] || false;
 
     return (
       <View style={styles.videoContainer}>
@@ -296,31 +312,35 @@ const ReelsScreen = ({ navigation, route }) => {
         <View style={styles.actions}>
           <TouchableOpacity
             style={styles.profileWrapper}
-            onPress={() => ownerId && navigation.navigate('OtherProfile', { userId: ownerId })}
+            onPress={() => goToProfile(ownerId)}
           >
             <Image
-              source={profilePic ? { uri: `${API_BASE_URL}${profilePic}` } : require('../Assests/user.png')}
+              source={profilePic ? { uri: getMediaUrl(profilePic) } : require('../Assests/user.png')}
               style={styles.profileImage}
             />
-            <TouchableOpacity
-              style={[styles.followDot, isFollowedUser && styles.followDotActive]}
-              onPress={() => handleFollow(ownerId)}
-            >
-              <Text style={styles.followPlus}>{isFollowedUser ? '✓' : '+'}</Text>
-            </TouchableOpacity>
+            {String(ownerId) !== String(myId) && (
+              <TouchableOpacity
+                style={[styles.followDot, isFollowedUser && styles.followDotActive]}
+                onPress={() => handleFollow(ownerId)}
+              >
+                <Text style={styles.followPlus}>{isFollowedUser ? '✓' : '+'}</Text>
+              </TouchableOpacity>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => handleLike(item._id)} style={styles.actionButton}>
-            <Animated.Text style={[styles.actionEmoji, { transform: [{ scale: likes[item._id] ? likeScale : 1 }] }]}>
-              {likes[item._id] ? '❤️' : '🤍'}
+            <Animated.Text style={[styles.actionEmoji, { transform: [{ scale: isLiked ? likeScale : 1 }] }]}>
+              {isLiked ? '❤️' : '🤍'}
             </Animated.Text>
             <Text style={styles.actionCount}>
-              {(item.likes?.length || 0) + (likes[item._id] && !item.likes?.map(String).includes(String(myId)) ? 1 : 0)}
+              {(item.likes?.length || 0) + (isLiked && !item.likes?.map(String).includes(String(myId)) ? 1 : 0)}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => openComments(item._id)} style={styles.actionButton}>
-            <Text style={styles.actionEmoji}>💬</Text>
+            {/* <Text style={styles.actionEmoji}>💬</Text> */}
+            <Image source={require("../Assests/comment.png") }style={{height:25,width:25,tintColor:"#cec8c8"}}/>
+
             <Text style={styles.actionCount}>{comments.length}</Text>
           </TouchableOpacity>
 
@@ -330,7 +350,8 @@ const ReelsScreen = ({ navigation, route }) => {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => handleShare(item.videoUrl)} style={styles.actionButton}>
-            <Text style={styles.actionEmoji}>↗️</Text>
+            {/* <Text style={styles.actionEmoji}>↗️</Text> */}
+            <Image source={require("../Assests/send.png") }style={{height:25,width:25,tintColor:"#cec8c8"}}/>
             <Text style={styles.actionCount}>Share</Text>
           </TouchableOpacity>
         </View>
@@ -338,7 +359,7 @@ const ReelsScreen = ({ navigation, route }) => {
         {/* Bottom info */}
         <View style={styles.bottomInfo}>
           <View style={styles.userRow}>
-            <TouchableOpacity onPress={() => ownerId && navigation.navigate('OtherProfile', { userId: ownerId })}>
+            <TouchableOpacity onPress={() => goToProfile(ownerId)}>
               <Text style={styles.username}>@{username}</Text>
             </TouchableOpacity>
             {String(ownerId) !== String(myId) && (
@@ -397,9 +418,22 @@ const ReelsScreen = ({ navigation, route }) => {
         }
       />
 
-      <Modal visible={commentModal} animationType="slide" transparent onRequestClose={() => setCommentModal(false)}>
-        <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setCommentModal(false)} />
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.commentSheet}>
+      {/* Comments Modal */}
+      <Modal 
+        visible={commentModal} 
+        animationType="slide" 
+        transparent 
+        onRequestClose={() => setCommentModal(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalBackdrop} 
+          activeOpacity={1} 
+          onPress={() => setCommentModal(false)} 
+        />
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+          style={styles.commentSheet}
+        >
           <View style={styles.commentHeader}>
             <Text style={styles.commentHeaderTitle}>Comments</Text>
             <TouchableOpacity onPress={() => setCommentModal(false)}>
@@ -420,7 +454,7 @@ const ReelsScreen = ({ navigation, route }) => {
             renderItem={({ item }) => (
               <View style={styles.commentItem}>
                 <Image
-                  source={item.userId?.profilePic ? { uri: `${API_BASE_URL}${item.userId.profilePic}` } : require('../Assests/user.png')}
+                  source={item.userId?.profilePic ? { uri: getMediaUrl(item.userId.profilePic) } : require('../Assests/user.png')}
                   style={styles.commentAvatar}
                 />
                 <View style={{ flex: 1 }}>
@@ -461,8 +495,19 @@ const styles = StyleSheet.create({
   actions: { position: 'absolute', bottom: 130, right: 12, alignItems: 'center' },
   profileWrapper: { alignItems: 'center', marginBottom: 14 },
   profileImage:   { width: 48, height: 48, borderRadius: 24, borderWidth: 2, borderColor: '#fff' },
-  followDot:      { position: 'absolute', bottom: -8, backgroundColor: '#FF007F', width: 20, height: 20, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
-  followDotActive:{ backgroundColor: '#444' },
+  followDot:      { 
+    position: 'absolute', 
+    bottom: -8, 
+    backgroundColor: '#FF007F', 
+    width: 22, 
+    height: 22, 
+    borderRadius: 11, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#000'
+  },
+  followDotActive: { backgroundColor: '#444' },
   followPlus:     { color: '#fff', fontSize: 13, fontWeight: 'bold', lineHeight: 20 },
   actionButton:   { alignItems: 'center', marginVertical: 10 },
   actionEmoji:    { fontSize: 28 },
@@ -475,19 +520,56 @@ const styles = StyleSheet.create({
   followBtnActive: { borderColor: '#666', backgroundColor: 'rgba(255,255,255,0.1)' },
   followBtnText:   { color: '#fff', fontWeight: '700', fontSize: 12 },
   videoTitle:      { color: '#fff', fontSize: 15, fontWeight: '800', marginBottom: 4 },
-  videoDescription:{ color: '#ddd', fontSize: 13, lineHeight: 18 },
+  videoDescription: { color: '#ddd', fontSize: 13, lineHeight: 18 },
   moreText:        { color: '#aaa', fontSize: 12, marginTop: 2 },
 
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' },
-  commentSheet:  { height: height * 0.65, backgroundColor: '#111', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingTop: 10 },
-  commentHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: 0.5, borderBottomColor: '#222' },
+  commentSheet:  { 
+    height: height * 0.65, 
+    backgroundColor: '#111', 
+    borderTopLeftRadius: 20, 
+    borderTopRightRadius: 20, 
+    paddingTop: 10 
+  },
+  commentHeader: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    paddingHorizontal: 16, 
+    paddingBottom: 12, 
+    borderBottomWidth: 0.5, 
+    borderBottomColor: '#222' 
+  },
   commentHeaderTitle: { color: '#fff', fontWeight: '800', fontSize: 16 },
-  commentItem:   { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 10, borderBottomWidth: 0.5, borderBottomColor: '#1a1a1a' },
+  commentItem:   { 
+    flexDirection: 'row', 
+    alignItems: 'flex-start', 
+    paddingVertical: 10, 
+    borderBottomWidth: 0.5, 
+    borderBottomColor: '#1a1a1a' 
+  },
   commentAvatar: { width: 34, height: 34, borderRadius: 17, marginRight: 10, backgroundColor: '#222' },
   commentUser:   { color: '#FF007F', fontWeight: '700', fontSize: 13 },
   commentText:   { color: '#ddd', fontSize: 14, marginTop: 2, lineHeight: 19 },
-  commentInputRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: 0.5, borderTopColor: '#222', backgroundColor: '#111' },
-  commentInput:  { flex: 1, backgroundColor: '#1e1e1e', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, color: '#fff', fontSize: 14, maxHeight: 80 },
+  commentInputRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingHorizontal: 14, 
+    paddingVertical: 10, 
+    borderTopWidth: 0.5, 
+    borderTopColor: '#222', 
+    backgroundColor: '#111' 
+  },
+  commentInput:  { 
+    flex: 1, 
+    backgroundColor: '#1e1e1e', 
+    borderRadius: 20, 
+    paddingHorizontal: 14, 
+    paddingVertical: 8, 
+    color: '#fff', 
+    fontSize: 14, 
+    maxHeight: 80 
+  },
   sendBtn:       { marginLeft: 10, backgroundColor: '#FF007F', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8 },
   sendBtnText:   { color: '#fff', fontWeight: '800', fontSize: 14 },
 });

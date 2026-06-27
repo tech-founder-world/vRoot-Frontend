@@ -404,7 +404,9 @@ const [myId, setMyId] = useState(null);
 
       {/* Search bar */}
       <View style={styles.searchBar}>
-        <Text style={styles.searchIcon}>🔍</Text>
+        {/* <Text style={styles.searchIcon}>🔍</Text> */}
+                    <Image source={require("../Assests/search.png") }style={{height:20,width:20,tintColor:"#9e9797"}}/>
+        
         <TextInput
           style={styles.searchInput}
           placeholder="Search users, posts, reels..."

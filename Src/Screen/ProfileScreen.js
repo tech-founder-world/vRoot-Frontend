@@ -289,9 +289,11 @@ export default function ProfileScreen({ navigation }) {
       <StatusBar barStyle="light-content" backgroundColor="#121212" />
 
       <View style={styles.header}>
-        <Text style={styles.headerName}>{user.username || user.name}</Text>
+        <Text style={styles.headerName}>@{user.username || user.name}</Text>
         <TouchableOpacity onPress={() => navigation.navigate('SettingScreen')}>
-          <Text style={styles.settingIcon}>☰</Text>
+          {/* <Text style={styles.settingIcon}>☰</Text> */}
+                      <Image source={require("../Assests/menu.png") }style={{height:25,width:25,tintColor:"#cec8c8"}}/>
+          
         </TouchableOpacity>
       </View>
 
