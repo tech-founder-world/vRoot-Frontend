@@ -414,8 +414,7 @@ const [myId, setMyId] = useState(null);
           value={query}
           onChangeText={onChangeText}
           returnKeyType="search"
-          onSubmitEditing={() => doSearch(query)}
-        />
+          onSubmitEditing={() => doSearch(query)}/>
         {query.length > 0 && (
           <TouchableOpacity onPress={() => { setQuery(''); setSearchMode(false); Keyboard.dismiss(); }}>
             <Text style={{ color: '#888', fontSize: 18, marginRight: 2 }}>✕</Text>
@@ -476,7 +475,7 @@ const styles = StyleSheet.create({
   bone: { backgroundColor: '#1a1a1a' },
 
   header: {
-    paddingTop: 52,
+    paddingTop:20,
     paddingHorizontal: 16,
     paddingBottom: 4,
   },
@@ -513,6 +512,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
     borderWidth: 1,
     borderColor: '#222',
+    marginBottom:25
   },
   chipActive: { backgroundColor: '#FF007F', borderColor: '#FF007F' },
   chipTxt: { color: '#666', fontSize: 13 },
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
     height: ITEM_SIZE * 1.4,
     margin: 1,
     backgroundColor: '#111',
-    borderRadius: 2,
+    borderRadius: 5,
     overflow: 'hidden',
   },
   gridItemBig: {

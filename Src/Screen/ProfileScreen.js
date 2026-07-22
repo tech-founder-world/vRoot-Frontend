@@ -9,6 +9,7 @@ import { API_BASE_URL } from '../config/config';
 import { getToken, logoutUser } from '../services/authStorage';
 
 const { width } = Dimensions.get('window');
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 const ITEM = (width - 4) / 3;
 
 // ✅ Cloudinary URL already poora https link hota hai.
@@ -354,7 +355,7 @@ export default function ProfileScreen({ navigation }) {
                 <Text style={[styles.tabTxt, tab === 'reels' && styles.tabTxtActive]}>▶  {reels.length}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.tab, tab === 'saved' && styles.tabActive]} onPress={() => { setTab('saved'); fetchSaved(); }}>
-                <Text style={[styles.tabTxt, tab === 'saved' && styles.tabTxtActive]}>🔖  {savedAll.length}</Text>
+                <Text style={[styles.tabTxt, tab === 'saved' && styles.tabTxtActive]}>🔖 {savedAll.length}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -362,7 +363,8 @@ export default function ProfileScreen({ navigation }) {
 
         ListEmptyComponent={
           <View style={[styles.center, { marginTop: 50 }]}>
-            <Text style={{ fontSize: 44 }}>{tab === 'posts' ? '🖼️' : tab === 'reels' ? '🎬' : '🔖'}</Text>
+            {/* <Text style={{ fontSize: 44 }}>{tab === 'posts' ?
+             '🖼️' : tab === 'reels' ? '🎬' : '🔖'}</Text>
             <Text style={{ color: '#555', marginTop: 10 }}>
               {tab === 'saved' ? 'Nothing saved yet' : `No ${tab} uploaded yet`}
             </Text>
@@ -370,9 +372,39 @@ export default function ProfileScreen({ navigation }) {
               <TouchableOpacity style={styles.uploadHint} onPress={() => navigation.navigate('UploadScreen')}>
                 <Text style={{ color: '#FF007F', fontWeight: '700' }}>Upload Now</Text>
               </TouchableOpacity>
-            )}
-          </View>
-        }
+            )} */}
+
+              <TouchableOpacity 
+              onPress={() => navigation.navigate('UploadScreen')}>
+              <Image
+      source={
+        tab === 'posts'
+          ? require('../Assests/upload.png')
+          : tab === 'reels'
+          ? require('../Assests/upload.png')
+          : require('../Assests/send.png')}
+          style={styles.uploadicon}
+         />
+         </TouchableOpacity>
+ 
+    <Text style={{ color: '#555', marginTop: 10 }}>
+      {tab === 'saved'
+        ? 'Nothing saved yet'
+        : `No ${tab} uploaded yet`}
+    </Text>
+
+    {tab !== 'saved' && (
+      <TouchableOpacity
+        style={styles.uploadHint}
+        onPress={() => navigation.navigate('UploadScreen')}>
+        <Text style={{ color: '#FF007F', fontWeight: '700' }}>
+          Upload Now
+        </Text>
+      </TouchableOpacity>
+    )}
+  </View>
+}
+     
 
         renderItem={renderGridItem}
       />
@@ -441,6 +473,7 @@ export default function ProfileScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  uploadicon:{ tintColor:'white',height:hp(5),width:wp(10)},
   container: { flex: 1, backgroundColor: '#121212', },
   center:    {  justifyContent: 'center', alignItems: 'center' },
   loginBtn:  { marginTop: 16, backgroundColor: '#FF007F', padding: 10, borderRadius: 8 },

@@ -11,6 +11,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { API_BASE_URL } from '../config/config';
 import { getToken } from '../services/authStorage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 const { width, height } = Dimensions.get('window');
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
@@ -166,13 +167,13 @@ const PostCard = ({ item, myId, onLike, onComment, onSave, onShare, onProfile, o
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => onMoreOptions(item)} style={styles.moreBtn}>
-          <Image source={require("../Assests/menu.png")} style={{ height: 25, width: 25, tintColor: "red" }} />
+          <Image source={require("../Assests/menu.png")} style={{ height: 25, width: 25, tintColor: "white" }} />
         </TouchableOpacity>
       </View>
 
       {/* ── Image ── */}
       <TouchableOpacity activeOpacity={1} onPress={handleDoubleTap} style={styles.imageWrapper}>
-        <Image source={{ uri: imageUri }} style={styles.postImage} resizeMode="cover" />
+        <Image source={{ uri: imageUri }} style={styles.postImage} />
         <FloatingHeart visible={heartVisible} />
       </TouchableOpacity>
 
@@ -188,16 +189,17 @@ const PostCard = ({ item, myId, onLike, onComment, onSave, onShare, onProfile, o
   </Animated.View>
 </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowCommentInput(s => !s)} style={styles.actionBtn} activeOpacity={0.7}>
-            <Image source={require("../Assests/comment.png")} style={{ height: 25, width: 25, tintColor: '#c9c4c7' }} />
+            <Image source={require("../Assests/comment.png")} style={{ height: 24, width: 24, tintColor: '#c9c4c7' }} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => onShare(item)} style={styles.actionBtn} activeOpacity={0.7}>
-            <Image source={require("../Assests/send.png")} style={{ height: 25, width: 25, tintColor: '#c9c4c7' }} />
+            <Image source={require("../Assests/send.png")} style={{ height: 24, width: 24, tintColor: '#c9c4c7' }} />
           </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={() => onSave(item._id)} activeOpacity={1}>
           <Image
             source={saved ? require("../Assests/save.png") : require("../Assests/unsave.png")}
-            style={[styles.actionIconImage, saved && { tintColor: '#c9c4c7' } ,!saved && {tintColor:"c9c4c7"}]}
+            style={{ height: 24, width: 24, tintColor: '#c9c4c7' }}
+            // style={[styles.actionIconImage, saved && { tintColor: '#c9c4c7' } ,!saved && {tintColor:"c9c4c7"}]}
           />
         </TouchableOpacity>
       </View>
@@ -277,7 +279,7 @@ const PostCard = ({ item, myId, onLike, onComment, onSave, onShare, onProfile, o
 
 // ── Inline Reel Card ──────────────────────────────────────
 const InlineReel = ({ item, navigation }) => {
-  const [paused, setPaused] = useState(true);
+  const [paused, setPaused] = useState(false);
   const videoUrl = item.videoUrl?.startsWith('http') ? item.videoUrl : `${API_BASE_URL}${item.videoUrl}`;
   const username = item.userId?.username || item.userId?.name || 'vRoot';
   const profileUri = item.userId?.profilePic
@@ -286,7 +288,11 @@ const InlineReel = ({ item, navigation }) => {
 
   return (
     <View style={styles.reelCard}>
-      <TouchableOpacity activeOpacity={1} onPress={() => setPaused(p => !p)} style={StyleSheet.absoluteFill}>
+      <TouchableOpacity activeOpacity={1} 
+      // onPress={() => setPaused(p => !p)} 
+      onPress={() => navigation.navigate('Reels', { initialIndex: 0, videos: [item] })}
+
+      style={StyleSheet.absoluteFill}>
         <Video
           source={{ uri: videoUrl }}
           style={StyleSheet.absoluteFill}
@@ -325,12 +331,12 @@ const InlineReel = ({ item, navigation }) => {
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.watchFullBtn}
         onPress={() => navigation.navigate('Reels', { initialIndex: 0, videos: [item] })}
       >
         <Text style={styles.watchFullText}>Watch Full Reel  →</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };
@@ -606,16 +612,16 @@ export default function HomeScreen({ navigation }) {
       <View style={styles.header}>
         <Text style={styles.appName}>vRoot</Text>
        <View style={styles.headerRight}>
-  <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('SearchScreen')}>
+  <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('explore')}>
     <Image 
-      source={require('../Assests/search.png')} 
+      source={require('../Assests/searchh.png')} 
       style={styles.headerIconImage} 
     />
   </TouchableOpacity>
   
   <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('NotificationScreen')}>
     <Image 
-      source={require('../Assests/bell.png')} 
+      source={require('../Assests/notification.png')} 
       style={styles.headerIconImage} 
     />
   </TouchableOpacity>
@@ -734,12 +740,14 @@ export default function HomeScreen({ navigation }) {
 
 // ── Styles ────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0a0a0a' },
+  container: { flex: 1,
+    backgroundColor: 'black',
+  padding:10  },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0a' },
 
   // Header
   header: {
-    height: 52,
+    height: 70,
     backgroundColor: '#0a0a0a',
     flexDirection: 'row',
     alignItems: 'center',
@@ -747,6 +755,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderBottomWidth: 0.5,
     borderBottomColor: '#1a1a1a',
+    padding:20,
   },
   appName: { color: '#FF007F', fontSize: 24, fontWeight: '900', letterSpacing: -0.5 },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 4 },
@@ -761,8 +770,8 @@ headerIcon: {
   padding: 6,
 },
 headerIconImage: {
-  width: 24,
-  height: 24,
+  width: 22,
+  height: 22,
   tintColor: '#c9c4c7', // Default color
 },
   // Stories
@@ -798,7 +807,17 @@ headerIconImage: {
   divider: { height: 0.5, backgroundColor: '#1a1a1a', marginTop: 4 },
 
   // Post Card
-  card: { backgroundColor: '#0a0a0a', marginBottom: 4 },
+  card: 
+  { backgroundColor: '#38383b',
+  marginBottom: 4 ,
+  borderRadius:20,
+  width:wp(95),
+  alignSelf:'center',
+  marginTop:15,
+  height:'auto',
+  justifyContent:"center"
+},
+
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -806,7 +825,9 @@ headerIconImage: {
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
+
   cardHeaderLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+
   avatarRing: {
     width: 42,
     height: 42,
@@ -825,7 +846,13 @@ headerIconImage: {
 
   // Post image
   imageWrapper: { position: 'relative' },
-  postImage: { width, height: width, backgroundColor: '#111' },
+  postImage: { backgroundColor: '#111',
+    height:hp(35),
+    width:wp(90),
+    alignSelf:'center',
+    borderRadius:10
+   },
+
   floatingHeart: {
     position: 'absolute',
     top: '50%',
@@ -859,7 +886,7 @@ headerIconImage: {
   commentRow: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, marginBottom: 2 },
   commentUsername: { color: '#fff', fontWeight: '700', fontSize: 13 },
   commentBody: { color: '#aaa', fontSize: 13, flexShrink: 1 },
-  timestampText: { color: '#444', fontSize: 11, paddingHorizontal: 12, marginBottom: 8, marginTop: 2 },
+  timestampText: { color: 'white', fontSize: 11, paddingHorizontal: 12, marginBottom: 8, marginTop: 2 },
 
   // Comment input
   commentInputRow: {
@@ -886,11 +913,15 @@ headerIconImage: {
 
   // Inline Reel
   reelCard: {
-    height: 500,
+    height: hp(59),
     backgroundColor: '#111',
     marginBottom: 4,
     position: 'relative',
     overflow: 'hidden',
+    width:wp(93),
+    alignSelf:'center',
+    borderRadius:15,
+    marginTop:10
   },
   reelOverlay: {
     ...StyleSheet.absoluteFillObject,

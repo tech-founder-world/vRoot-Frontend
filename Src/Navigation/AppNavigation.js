@@ -22,6 +22,7 @@ import VerifyOtp from '../Auth/ForgetPassword/VerifyOtp';
 import ChangePassword from '../Auth/ForgetPassword/ChangePassword';
 import PrivacyPolicyScreen from '../Screen/PrivacyPolicyScreen';
 import TermsScreen from '../Screen/TermsScreen';
+import ExploreScreen from '../Screen/ExploreScreen';
 
 enableScreens();
 
@@ -59,7 +60,8 @@ const AppNavigation = ({ isLoggedIn }) => {
       <Stack.Screen name="VerifyOtp"component={VerifyOtp} options={{headerShown:false}}/>
       <Stack.Screen name="ResetPassword"component={ChangePassword} options={{headerShown:false}}/>
       <Stack.Screen name="Privacypolicy"component={PrivacyPolicyScreen} options={{headerShown:false}}/>
-      <Stack.Screen name="termsscreen"component={TermsScreen} options={{headerShown:false}}/>
+
+      <Stack.Screen name="explore"component={ExploreScreen} options={{headerShown:false}}/>
 
 
     </Stack.Navigator>

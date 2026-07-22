@@ -147,6 +147,7 @@ const ReelsScreen = ({ navigation, route }) => {
   }, []);
 
   // ── Like ─────────────────────────────────────
+
   const handleLike = async (videoId) => {
     setLikes(prev => {
       const updated = { ...prev, [videoId]: !prev[videoId] };
@@ -167,7 +168,8 @@ const ReelsScreen = ({ navigation, route }) => {
     } catch (e) { console.log(e); }
   };
 
-  // ── Save ─────────────────────────────────────
+  // ── Save ───────────────────────────────────
+
   const handleSave = async (videoId) => {
     setSaved(prev => ({ ...prev, [videoId]: !prev[videoId] }));
     try {
@@ -222,7 +224,8 @@ const ReelsScreen = ({ navigation, route }) => {
     }
   };
 
-  // ── Share ─────────────────────────────────────
+  // ── Share ───────────────────────────────
+
   const handleShare = async (videoUrl) => {
     try {
       const url = videoUrl?.startsWith('http') ? videoUrl : `${API_BASE_URL}${videoUrl}`;
@@ -346,6 +349,7 @@ const ReelsScreen = ({ navigation, route }) => {
 
           <TouchableOpacity onPress={() => handleSave(item._id)} style={styles.actionButton}>
             <Text style={styles.actionEmoji}>{isSaved ? '🔖' : '📤'}</Text>
+            
             <Text style={styles.actionCount}>{isSaved ? 'Saved' : 'Save'}</Text>
           </TouchableOpacity>
 
@@ -487,7 +491,7 @@ const ReelsScreen = ({ navigation, route }) => {
 export default ReelsScreen;
 
 const styles = StyleSheet.create({
-  container:       { flex: 1, backgroundColor: '#000' },
+  container:       { flex: 1, backgroundColor: '#000000' },
   videoContainer:  { width, height, backgroundColor: '#000' },
   videoPlayer:     { width, height, position: 'absolute', top: 0, left: 0 },
   loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' },
