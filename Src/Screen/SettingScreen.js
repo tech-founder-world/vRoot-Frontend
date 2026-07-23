@@ -124,7 +124,7 @@ const SettingsScreen = ({ navigation }) => {
       <View style={styles.settingbox}>
 
      <View style={styles.settingItem}>
-        <Image source={require('../Assests/padlock.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
+        <Image source={require('../Assests/private.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Private Account</Text>
                    <Switch
                      value={isPrivate}
@@ -169,7 +169,7 @@ const SettingsScreen = ({ navigation }) => {
       </View>
 
     <View style={styles.settingItem}>
-        <Image source={require('../Assests/add-friend.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
+        <Image source={require('../Assests/user.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Active Status</Text>
         <Switch
           value={notificationsEnabled}
@@ -186,24 +186,29 @@ const SettingsScreen = ({ navigation }) => {
             <Text style={styles.header}>App Security</Text>
                    <View style={styles.settingbox}>
 
-      <TouchableOpacity style={styles.settingItem} onPress={()=>navigation.navigate('PrivacyScreen')}>
+      {/* <TouchableOpacity style={styles.settingItem} onPress={()=>navigation.navigate('PrivacyScreen')}>
         <Image source={require('../Assests/secure.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Privacy & Security</Text>
+      </TouchableOpacity> */}
+
+      <TouchableOpacity style={styles.settingItem} onPress={()=>navigation.navigate('Privacypolicy')}>
+        <Image source={require('../Assests/secure.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
+        <Text style={styles.settingText}>Privacy Policy</Text>
       </TouchableOpacity>
 
+
       {/* Help & Support */}
-      <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('Support')}>
+      <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate("termsscreen")}>
         <Image source={require('../Assests/help.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Help & Support</Text>
       </TouchableOpacity>
 
       {/* Help & Support */}
-      <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('Support')}>
-        <Image source={require('../Assests/help.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
+      <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('termsscreen')}>
+        <Image source={require('../Assests/terms.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
         <Text style={styles.settingText}>Terms & Condition</Text>
       </TouchableOpacity>
 
-       <View style={styles.settingbox}>
 
       {/* About App */}
       <TouchableOpacity style={styles.settingItem} onPress={() => navigation.navigate('About')}>
@@ -211,7 +216,6 @@ const SettingsScreen = ({ navigation }) => {
         <Text style={styles.settingText}>About vRoot</Text>
       </TouchableOpacity>
 
-      </View>
       </View>
 
       {/* Logout */}

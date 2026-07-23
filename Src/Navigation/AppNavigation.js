@@ -20,6 +20,9 @@ import UploadPostScreen from '../Screen/UploadPostScreen'
 import GetOtp from '../Auth/ForgetPassword/GetOtp';
 import VerifyOtp from '../Auth/ForgetPassword/VerifyOtp';
 import ChangePassword from '../Auth/ForgetPassword/ChangePassword';
+import PrivacyPolicyScreen from '../Screen/PrivacyPolicyScreen';
+import TermsScreen from '../Screen/TermsScreen';
+import ExploreScreen from '../Screen/ExploreScreen';
 
 enableScreens();
 
@@ -54,9 +57,13 @@ const AppNavigation = ({ isLoggedIn }) => {
       <Stack.Screen name="UploadScreen" component={UploadPostScreen} options={{ headerShown: false }} />
   
       <Stack.Screen name="Getotp"component={GetOtp} options={{headerShown:false}}/>
-      <Stack.Screen name="Verifyotp"component={VerifyOtp} options={{headerShown:false}}/>
-      <Stack.Screen name="changepassword"component={ChangePassword} options={{headerShown:false}}/>
-   
+      <Stack.Screen name="VerifyOtp"component={VerifyOtp} options={{headerShown:false}}/>
+      <Stack.Screen name="ResetPassword"component={ChangePassword} options={{headerShown:false}}/>
+      <Stack.Screen name="Privacypolicy"component={PrivacyPolicyScreen} options={{headerShown:false}}/>
+
+      <Stack.Screen name="explore"component={ExploreScreen} options={{headerShown:false}}/>
+
+
     </Stack.Navigator>
   );
 };

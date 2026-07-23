@@ -2,6 +2,36 @@ import { StyleSheet } from "react-native"
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
  
 const styles = StyleSheet.create({
+  priheader:
+  {
+    fontSize:hp(2.5),
+    fontWeight:'bold',
+    color:'white',
+    marginTop:10,
+    marginBottom:5
+  },
+  pricontainer:
+  {
+    padding:20,
+    flex:1
+    },
+  privacybox:
+  {
+    backgroundColor:'#38383b',
+    // height:"auto",
+    width:wp(95),
+    alignSelf:'center',
+    borderRadius:30,
+    padding:20,
+    elavation:10,
+    // paddingTop:-20,
+    elevation:10,
+    marginVertical:7,
+    // justifyContent:'center',
+    // flexDirection:'column',
+    // alignItems:"center"
+    
+  },
   mainContainer: {
     flex: 1,
     backgroundColor: '#000',
@@ -261,7 +291,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 30,
+    padding: 20,
   },
 
   heading: {

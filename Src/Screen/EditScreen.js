@@ -207,23 +207,24 @@ const EditScreen = ({ navigation, route }) => {
           </View>
 
           {/* PROFILE IMAGE */}
-          <View style={styles.profileSection}>
+          <TouchableOpacity 
+          style={styles.profileSection}
+          onPress={pickImage}>
 
             <LinearGradient
               colors={['#FF007F', '#7F5CFF']}
-              style={styles.profileBorder}
-            >
+              style={styles.profileBorder}>
 
               <Image
                 source={{
                   uri: profilePic || defaultPic
                 }}
                 style={styles.profilePic}
-              />
+                onPress={pickImage}/>
 
             </LinearGradient>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               activeOpacity={0.8}
               onPress={pickImage}
             >
@@ -239,9 +240,9 @@ const EditScreen = ({ navigation, route }) => {
 
               </LinearGradient>
 
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
-          </View>
+          </TouchableOpacity>
 
           {/* FORM */}
           <View style={styles.formContainer}>
