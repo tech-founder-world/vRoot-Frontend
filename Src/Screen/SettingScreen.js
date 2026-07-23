@@ -183,32 +183,6 @@ const SettingsScreen = ({ navigation }) => {
 
       </View>
 
-      {/* Notifications Toggle */}
-      {/* <View style={styles.settingItem}>
-        <Image source={require('../Assests/bell.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
-        <Text style={styles.settingText}>Notifications</Text>
-        <Switch
-          value={notificationsEnabled}
-          onValueChange={toggleNotifications}
-          thumbColor={darkMode ? '#FF007F' : '#E0E0E0'}
-          trackColor={{ false: '#D3D3D3', true: '#FF69B4' }}
-          style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }} // Slightly enlarges the switch
-        />
-      </View> */}
-
-      {/* Theme Toggle */}
-      {/* <View style={styles.settingItem}>
-        <Image source={require('../Assests/dark.png')} style={{ height: 18, width: 18, tintColor: '#FF007F' }} />
-        <Text style={styles.settingText}>Dark Mode</Text>
-        <Switch
-          value={darkMode}
-          onValueChange={toggleDarkMode}
-          thumbColor={darkMode ? '#FF007F' : '#E0E0E0'}
-          trackColor={{ false: '#D3D3D3', true: '#FF69B4' }}
-          style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }} // Slightly enlarges the switch
-        />
-      </View> */}
-
             <Text style={styles.header}>App Security</Text>
                    <View style={styles.settingbox}>
 
