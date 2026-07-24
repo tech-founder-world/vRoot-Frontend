@@ -23,6 +23,9 @@ import ChangePassword from '../Auth/ForgetPassword/ChangePassword';
 import PrivacyPolicyScreen from '../Screen/PrivacyPolicyScreen';
 import TermsScreen from '../Screen/TermsScreen';
 import ExploreScreen from '../Screen/ExploreScreen';
+import InsightScreen from '../Screen/InsightScreen';
+import WatchpartyScreen from '../Screen/WatchpartyScreen';
+import CreateroomScreen from '../Screen/CreateroomScreen';
 
 enableScreens();
 
@@ -62,6 +65,11 @@ const AppNavigation = ({ isLoggedIn }) => {
       <Stack.Screen name="Privacypolicy"component={PrivacyPolicyScreen} options={{headerShown:false}}/>
 
       <Stack.Screen name="explore"component={ExploreScreen} options={{headerShown:false}}/>
+      <Stack.Screen name="insight"component={InsightScreen} options={{headerShown:false}}/>
+      <Stack.Screen name="watchparty"component={WatchpartyScreen} options={{headerShown:false}}/>
+      <Stack.Screen name="createroom"component={CreateroomScreen} options={{headerShown:false}}/>
+
+
 
 
     </Stack.Navigator>

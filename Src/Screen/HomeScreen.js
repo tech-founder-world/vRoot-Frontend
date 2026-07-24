@@ -316,19 +316,19 @@ const InlineReel = ({ item, navigation }) => {
           </View>
         )}
 
-        <View style={styles.reelBottom}>
-          <View style={styles.reelUserRow}>
-            <Image
-              source={profileUri ? { uri: profileUri } : require('../Assests/user.png')}
-              style={styles.reelAvatar}
-            />
-            <Text style={styles.reelUsername}>@{username}</Text>
+          <View style={styles.reelBottom}>
+            <View style={styles.reelUserRow}>
+              <Image
+                source={profileUri ? { uri: profileUri } : require('../Assests/user.png')}
+                style={styles.reelAvatar}
+              />
+              <Text style={styles.reelUsername}>@{username}</Text>
+            </View>
+            {!!item.title && <Text style={styles.reelTitle} numberOfLines={2}>{item.title}</Text>}
+            {!!(item.description || item.caption) && (
+              <Text style={styles.reelDesc} numberOfLines={1}>{item.description || item.caption}</Text>
+            )}
           </View>
-          {!!item.title && <Text style={styles.reelTitle} numberOfLines={2}>{item.title}</Text>}
-          {!!(item.description || item.caption) && (
-            <Text style={styles.reelDesc} numberOfLines={1}>{item.description || item.caption}</Text>
-          )}
-        </View>
       </TouchableOpacity>
 
       {/* <TouchableOpacity
@@ -612,6 +612,14 @@ export default function HomeScreen({ navigation }) {
       <View style={styles.header}>
         <Text style={styles.appName}>vRoot</Text>
        <View style={styles.headerRight}>
+
+        <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('watchparty')}>
+    <Image 
+      source={require('../Assests/watch.png')} 
+      style={[styles.headerIconImage,{width:wp(7)}]} 
+    />
+  </TouchableOpacity>
+
   <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('explore')}>
     <Image 
       source={require('../Assests/searchh.png')} 
@@ -622,6 +630,13 @@ export default function HomeScreen({ navigation }) {
   <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('NotificationScreen')}>
     <Image 
       source={require('../Assests/notification.png')} 
+      style={styles.headerIconImage} 
+    />
+  </TouchableOpacity>
+
+  <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('insight')}>
+    <Image 
+      source={require('../Assests/viewer.png')} 
       style={styles.headerIconImage} 
     />
   </TouchableOpacity>

@@ -184,8 +184,6 @@ const styles = StyleSheet.create({
     elevation:10,
     alignItems:'center',
     justifyContent:'center'
-
-
   },
     header: { fontSize:hp(2.5),
        fontWeight: 'bold',

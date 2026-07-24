@@ -10,6 +10,7 @@ import Share from 'react-native-share';
 import { useFocusEffect } from '@react-navigation/native';
 import { API_BASE_URL } from '../config/config';
 import { getToken } from '../services/authStorage';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 const { height, width } = Dimensions.get('window');
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
@@ -39,6 +40,7 @@ const ReelsScreen = ({ navigation, route }) => {
   const flatListRef = useRef(null);
 
   // ✅ Helper to get full media URL
+
   const getMediaUrl = (path) => {
     if (!path) return null;
     if (path.startsWith('http://') || path.startsWith('https://')) {
@@ -313,7 +315,7 @@ const ReelsScreen = ({ navigation, route }) => {
 
         {/* Right actions */}
         <View style={styles.actions}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.profileWrapper}
             onPress={() => goToProfile(ownerId)}
           >
@@ -329,12 +331,15 @@ const ReelsScreen = ({ navigation, route }) => {
                 <Text style={styles.followPlus}>{isFollowedUser ? '✓' : '+'}</Text>
               </TouchableOpacity>
             )}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity onPress={() => handleLike(item._id)} style={styles.actionButton}>
             <Animated.Text style={[styles.actionEmoji, { transform: [{ scale: isLiked ? likeScale : 1 }] }]}>
-              {isLiked ? '❤️' : '🤍'}
+              {/* {isLiked ? '❤️' : '🤍'} */}
             </Animated.Text>
+             <Image source={isLiked ? require("../Assests/fillheart.png"): require("../Assests/like.png")}
+             style={[styles.actionEmoji,{width:wp(6.2),tintColor:isLiked? 'red':"white"}]} />
+             
             <Text style={styles.actionCount}>
               {(item.likes?.length || 0) + (isLiked && !item.likes?.map(String).includes(String(myId)) ? 1 : 0)}
             </Text>
@@ -342,27 +347,47 @@ const ReelsScreen = ({ navigation, route }) => {
 
           <TouchableOpacity onPress={() => openComments(item._id)} style={styles.actionButton}>
             {/* <Text style={styles.actionEmoji}>💬</Text> */}
-            <Image source={require("../Assests/comment.png") }style={{height:25,width:25,tintColor:"#cec8c8"}}/>
+            <Image source={require("../Assests/comment.png") }style={[styles.actionEmoji,{width:wp(6.2)}]}/>
 
             <Text style={styles.actionCount}>{comments.length}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => handleSave(item._id)} style={styles.actionButton}>
-            <Text style={styles.actionEmoji}>{isSaved ? '🔖' : '📤'}</Text>
+            {/* <Text style={styles.actionEmoji}>{isSaved ? '🔖' : '📤'}</Text> */}
+            <Image source={isSaved? require("../Assests/save.png"): require("../Assests/unsave.png")}
+            style={styles.actionEmoji}/>
             
             <Text style={styles.actionCount}>{isSaved ? 'Saved' : 'Save'}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => handleShare(item.videoUrl)} style={styles.actionButton}>
             {/* <Text style={styles.actionEmoji}>↗️</Text> */}
-            <Image source={require("../Assests/send.png") }style={{height:25,width:25,tintColor:"#cec8c8"}}/>
+            <Image source={require("../Assests/send.png") }style={[styles.actionEmoji,{width:wp(6.2)}]}/>
             <Text style={styles.actionCount}>Share</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity>
+            <Image source={require("../Assests/dots.png")}
+            style={styles.actionEmoji}/>
+            <Text style={styles.actionCount}>More</Text>
           </TouchableOpacity>
         </View>
 
         {/* Bottom info */}
         <View style={styles.bottomInfo}>
           <View style={styles.userRow}>
+
+<TouchableOpacity
+            style={styles.profileWrapper}
+            onPress={() => goToProfile(ownerId)}
+          >
+            <Image
+              source={profilePic ? { uri: getMediaUrl(profilePic) } : require('../Assests/user.png')}
+              style={styles.profileImage}
+            />
+           
+          </TouchableOpacity>
+
             <TouchableOpacity onPress={() => goToProfile(ownerId)}>
               <Text style={styles.username}>@{username}</Text>
             </TouchableOpacity>
@@ -493,10 +518,10 @@ export default ReelsScreen;
 const styles = StyleSheet.create({
   container:       { flex: 1, backgroundColor: '#000000' },
   videoContainer:  { width, height, backgroundColor: '#000' },
-  videoPlayer:     { width, height, position: 'absolute', top: 0, left: 0 },
+  videoPlayer:     { width:wp(99), height:hp(95), position: 'absolute', top: 0, left: 0,alignSelf:'center',justifyContent:'center' },
   loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' },
 
-  actions: { position: 'absolute', bottom: 130, right: 12, alignItems: 'center' },
+  actions: { position: 'absolute', bottom: 140, right: 12, alignItems: 'center' },
   profileWrapper: { alignItems: 'center', marginBottom: 14 },
   profileImage:   { width: 48, height: 48, borderRadius: 24, borderWidth: 2, borderColor: '#fff' },
   followDot:      { 
@@ -514,7 +539,7 @@ const styles = StyleSheet.create({
   followDotActive: { backgroundColor: '#444' },
   followPlus:     { color: '#fff', fontSize: 13, fontWeight: 'bold', lineHeight: 20 },
   actionButton:   { alignItems: 'center', marginVertical: 10 },
-  actionEmoji:    { fontSize: 28 },
+  actionEmoji:    { height:hp(3),width:wp(5),tintColor:'white' },
   actionCount:    { color: '#fff', fontSize: 12, marginTop: 2, fontWeight: '600' },
 
   bottomInfo: { position: 'absolute', bottom: 90, left: 12, width: '75%' },
